@@ -207,7 +207,7 @@
           },
           "dataDisks": [
             {
-              "diskSizeGB": 1023,
+              "diskSizeGB": 15,
               "lun": 0,
               "createOption": "Empty"
             }

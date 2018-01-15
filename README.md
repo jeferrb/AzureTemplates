@@ -1,9 +1,9 @@
 # Templates for Azure VMs
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/ruycastilho/AzureTemplates/master/azuredeploy.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
-<a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/ruycastilho/AzureTemplates/master/azuredeploy.json" target="_blank">
+<a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" target="_blank">
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
@@ -39,12 +39,12 @@ Deploying Ubuntu:
 * az group deployment create \
     --name &lt;VMname&gt; \
     --resource-group &lt;ResourceGroupName&gt; \
-    --template-uri "https://raw.githubusercontent.com/ruycastilho/AzureTemplates/master/azuredeploy.json"
+    --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json"
     --parameters ImageOffer=UbuntuServer ImagePublisher=Canonical OSVersion=16.04
 
 Deploying CentOS:
 * az group deployment create \
     --name &lt;VMname&gt; \
     --resource-group &lt;ResourceGroupName&gt; \
-    --template-uri "https://raw.githubusercontent.com/ruycastilho/AzureTemplates/master/azuredeploy.json"
+    --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json"
     --parameters ImageOffer=CentOS-HPC ImagePublisher=OpenLogic OSVersion=7.3
