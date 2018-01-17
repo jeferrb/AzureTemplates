@@ -3,7 +3,7 @@
 VERSION=2.4
 
 sudo apt-get -y update
-sudo apt-get install -y wget make gcc openmpi-bin openmpi-common
+sudo apt-get install -y wget make gcc openmpi-bin openmpi-common libgfortran3
 wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION
