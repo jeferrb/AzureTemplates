@@ -4,7 +4,32 @@ VERSION=2.4
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-sudo apt-get install -y wget make gcc mpich mpich-doc libgfortran3 tmux htop git sysstat
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev
+# For mpich do: sudo apt-get install mpich libmpich-dev libhdf5-mpich-dev
+
+# wget -q https://www.open-mpi.org/software/ompi/v3.0/downloads/openmpi-3.0.0.tar.gz
+# tar -zxf openmpi-3.0.0.tar.gz
+# cd openmpi-3.0.0
+# ./configure --with-device=ch3:ssm --prefix="/home/$USER/.openmpi"
+# make -j2 && sudo make install
+# cat <<EOT >> ~/.bashrc
+# export PATH="$PATH:/home/$USER/.openmpi/bin"
+# export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
+# EOT
+# source ~/.bashrc
+
+
+# wget http://www.mpich.org/static/downloads/3.2.1/mpich-3.2.1.tar.gz
+# tar -zxf mpich-3.2.1.tar.gz
+# cd mpich-3.2.1
+# ./configure --prefix=/usr/local/mpich2-1.0 >& configure.log
+# make -j >& make.log
+# sudo make install >& install.log
+# cat <<EOT >> ~/.bashrc
+# export PATH="$PATH:/usr/local/mpich2-1.0"
+# EOT
+# source ~/.bashrc
+
 wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION

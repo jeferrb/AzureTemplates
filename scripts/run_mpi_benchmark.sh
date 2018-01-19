@@ -2,7 +2,7 @@
 
 # the first paramiter is the password
 
-GROUP_NAME=mpi2
+GROUP_NAME=mpi1
 NUMBER_EXECUTIONS=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
 NUMBER_REPETITIONS=5
