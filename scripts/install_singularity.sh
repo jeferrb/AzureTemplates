@@ -4,19 +4,7 @@ VERSION=2.4
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-sudo apt-get install -y wget make gcc mpich mpich-doc libgfortran3 tmux htop git sysstat libibnetdisc-dev
-
-wget -q https://www.open-mpi.org/software/ompi/v3.0/downloads/openmpi-3.0.0.tar.gz
-tar -zxf openmpi-3.0.0.tar.gz
-cd openmpi-3.0.0
-./configure --prefix="/home/$USER/.openmpi"
-make -j2 && sudo make install
-source ~/.bashrc
-cat <<EOT >> ~/.bashrc
-export PATH="$PATH:/home/$USER/.openmpi/bin"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
-EOT
-
+sudo apt-get install -y wget make gcc mpich mpich-doc libgfortran3 tmux htop git sysstat
 wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION
