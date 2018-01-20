@@ -7,7 +7,7 @@ NUMBER_INSTANCES=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
 NUMBER_REPETITIONS=5
 NUMBER_RROCESSORS=2
-VM_SIZES=("Standard_D2s_v3" "Standard_NC6")
+declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
 VM_SIZE=${VM_SIZES[${3}]}
 RESULTS_DIRECTORY="${VM_SIZE}_result"
 set -x
