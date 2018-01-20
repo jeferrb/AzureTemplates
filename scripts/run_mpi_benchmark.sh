@@ -1,15 +1,19 @@
 #!/bin/sh
 
-# the first paramiter is the password
+# the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the GroupName
 
-GROUP_NAME=mpi1
-NUMBER_EXECUTIONS=3
+GROUP_NAME=mpi${VM_SIZE}
+NUMBER_INSTANCES=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
 NUMBER_REPETITIONS=5
+NUMBER_RROCESSORS=2
+VM_SIZES=("Standard_D2s_v3" "Standard_NC6")
+VM_SIZE=${VM_SIZES[${3}]}
+RESULTS_DIRECTORY="${VM_SIZE}_result"
 set -x
 
 function pause(){
-    read -p "$*"
+    # read -p "$*"
 }
 
 echo "------------------------------------------"  >> file.log.old
@@ -18,11 +22,11 @@ date > file.log
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
 
-for (( i = 1; i < $NUMBER_EXECUTIONS + 1 ; i++ )); do
+for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     echo "Creating the machine number $i"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
     az group deployment create --name SingularityTest --resource-group $GROUP_NAME \
-    --template-file azuredeploy.json --parameters vmSize="Standard_D2s_v3" vmName="testMpi${i}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${i}" \
+    --template-file azuredeploy.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${i}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${i}" \
     adminPassword=$1 scriptParameterPassMount=$2 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> file.log
     SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
@@ -50,15 +54,21 @@ grep "ssh " file.log | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i
 
 pause "Press [Enter] key to execute"
 
-scp scripts/run_bench.sh ${SSH_ADDR}:
 
-SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_EXECUTIONS}+3 | bc) | tr '\n'  " "  | sed 's/ /,10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
+# SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
+# echo "${SUBNET_HOSTS}" > hostfile
+# scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
+seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed 's/n/ slots=${NUMBER_RROCESSORS}n/g' | tr 'n' '\n' > hostfile
 ssh ${SSH_ADDR} << EOF
+    set -x
+    for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+        ssh-keyscan -H 10.0.0.${host} >> ~/.ssh/known_hosts
+    done
     chmod +x run_bench.sh
-    ./run_bench.sh "${NUMBER_REPETITIONS} ${SUBNET_HOSTS} ${BIN_PATH}"
+    ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
 EOF
-mkdir results
-scp '${SSH_ADDR}:/home/username/*.log' results
+mkdir ${RESULTS_DIRECTORY}
+scp '${SSH_ADDR}:/home/username/*.log' ${RESULTS_DIRECTORY}
 
 pause "Press [Enter] key to delete the group ${GROUP_NAME}"
 az group delete --resource-group ${GROUP_NAME} --yes --no-wait
@@ -81,7 +91,7 @@ for (( i = 0; i < 0; i++ )); do
     ssh-keyscan -H [ip_address] >> ~/.ssh/known_hosts
     ssh-keyscan -H [hostname] >> ~/.ssh/known_hosts
 
-        # mpirun -np ${NUMBER_EXECUTIONS} -host ${SUBNET_HOSTS} ./mymountpoint/NPB3.3-MPI/bin/sp.S.16 >> remote.log
+        # mpirun -np ${NUMBER_INSTANCES} -host ${SUBNET_HOSTS} ./mymountpoint/NPB3.3-MPI/bin/sp.S.16 >> remote.log
 
 
 # echo "=========================================="  >> results.log

@@ -4,6 +4,7 @@
   "parameters": {
     "adminUsername": {
       "type": "string",
+      "defaultValue": "username",
       "metadata": {
         "description": "User name for the Virtual Machine."
       }
@@ -13,6 +14,9 @@
       "metadata": {
         "description": "Password for the Virtual Machine."
       }
+    },
+    "adminPublicKey": {
+      "type": "string"
     },
     "dnsLabelPrefix": {
       "type": "string",
@@ -76,9 +80,22 @@
         "description": "The size of the VM to create"
       }
     },
+    "vmName": {
+      "type": "string",
+      "defaultValue": "MySingularityVM",
+      "metadata": {
+        "description": "The name of the VM to create"
+      }
+    },
+    "scriptParameterPassMount": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Passowrd to mount the volume"
+      }
+    },
     "_artifactsLocation": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/centos-singularity",
+      "defaultValue": "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located"
       }
@@ -93,8 +110,8 @@
   },
   "variables": {
     "addressPrefix": "10.0.0.0/16",
-    "nicName": "myVMNic",
-    "publicIPAddressName": "myPublicIP",
+    "nicName": "[concat(parameters('vmName'), 'myVMNic', parameters('dnsLabelPrefix'))]",
+    "publicIPAddressName": "[concat(parameters('vmName'), 'myPublicIP', parameters('dnsLabelPrefix'))]",
     "publicIPAddressType": "Dynamic",
     "scriptFileName": "install_singularity.sh",
     "scriptFolder": "scripts",
@@ -103,8 +120,7 @@
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('virtualNetworkName'), variables('subnetName'))]",
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'singvm')]",
     "storageAccountType": "Standard_LRS",
-    "virtualNetworkName": "MyVNET",
-    "vmName": "MySingularityVM"
+    "virtualNetworkName": "MyVNET"
     },
   "resources": [
     {
@@ -180,7 +196,7 @@
     {
       "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[variables('vmName')]",
+      "name": "[parameters('vmName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
@@ -191,9 +207,20 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[variables('vmName')]",
+          "computerName": "[parameters('vmName')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": "[parameters('adminPassword')]",
+          "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                  "publicKeys": [
+                      {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPublicKey')]"
+                      }
+                  ]
+              }
+          }
         },
         "storageProfile": {
           "imageReference": {
@@ -207,7 +234,7 @@
           },
           "dataDisks": [
             {
-              "diskSizeGB": 1023,
+              "diskSizeGB": 30,
               "lun": 0,
               "createOption": "Empty"
             }
@@ -230,11 +257,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'), '/InstallSingularity')]",
+      "name": "[concat(parameters('vmName'), '/InstallSingularity')]",
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
       "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
       ],
       "tags": {
           "displayName": "InstallSingularity"
@@ -246,9 +273,9 @@
           "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "[concat(parameters('_artifactsLocation'), '/', variables('scriptFolder'), '/', variables('scriptFileName'), parameters('_artifactsLocationSasToken'))]"
+            "[concat(parameters('_artifactsLocation'), '/', variables('scriptFolder'), '/', variables('scriptFileName'))]"
           ],
-          "commandToExecute": "[concat('sh install-singularity.sh',' ', parameters('singularityVersion'))]"
+           "commandToExecute": "[concat('./', variables('scriptFileName'), ' ', parameters('scriptParameterPassMount'), '&>> /home/username/install_script.log')]"
         }
       }
     }
