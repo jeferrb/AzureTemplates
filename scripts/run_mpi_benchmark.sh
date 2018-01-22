@@ -11,7 +11,7 @@ declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
 # VM_SIZE=${VM_SIZES[${3}]}
 VM_SIZE=${VM_SIZES[0]}
 RESULTS_DIRECTORY="results/${VM_SIZE}_result"
-set -x
+# set -x
 
 function pause(){
     # read -p "$*"
@@ -32,7 +32,7 @@ fi
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     echo "Creating the machine number $i"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
-    az group deployment create --name "SingularityTest$(whoami)" --resource-group $GROUP_NAME \
+    az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
     --template-file azuredeploy.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${i}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${i}" \
     adminPassword=$1 scriptParameterPassMount=$2 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> file.log
     SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
@@ -87,6 +87,7 @@ echo "az group delete --resource-group ${GROUP_NAME} --yes --no-wait"
 
 ###########
 if [[ $50 ]]; then
+    echo "DONE!!"
     #statements
     # mpirun -np 20 singularity exec ./mpi_sample  mymountpoint/ubuntu.img
     # mpirun -np 5 -host 10.0.0.5, 10.0.0.4 ./mpi_sample
