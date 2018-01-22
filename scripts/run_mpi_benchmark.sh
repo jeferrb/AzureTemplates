@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the GroupName
 
@@ -50,8 +50,8 @@ SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 ssh ${SSH_ADDR} << EOF
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 EOF
-scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_host.pub
-grep "ssh " file.log | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_host.pub
+scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator.pub
+grep "ssh " file.log | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_coodinator.pub
 
 pause "Press [Enter] key to execute"
 
@@ -63,7 +63,7 @@ scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
 ssh ${SSH_ADDR} << EOF
     set -x
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        ssh-keyscan -H 10.0.0."${host}" >> ~/.ssh/known_hosts
+        ssh-keyscan -H "10.0.0.${host}" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
