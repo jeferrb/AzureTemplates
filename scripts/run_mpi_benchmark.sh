@@ -8,7 +8,8 @@ BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
 NUMBER_REPETITIONS=5
 NUMBER_RROCESSORS=2
 declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
-VM_SIZE=${VM_SIZES[${3}]}
+# VM_SIZE=${VM_SIZES[${3}]}
+VM_SIZE=${VM_SIZES[0]}
 RESULTS_DIRECTORY="${VM_SIZE}_result"
 set -x
 
@@ -22,6 +23,11 @@ cat file.log >> file.log.old
 date > file.log
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
+
+if [ -d "~/.ssh/id_rsa.pub" ]; then
+    # if there is not an rsa key, create it
+    ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+fi
 
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     echo "Creating the machine number $i"
@@ -69,7 +75,8 @@ ssh ${SSH_ADDR} << EOF
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
 EOF
 mkdir ${RESULTS_DIRECTORY}
-scp '${SSH_ADDR}:/home/username/*.log' ${RESULTS_DIRECTORY}
+scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
+scp "${SSH_ADDR}:/home/username/*.sa" ${RESULTS_DIRECTORY}
 
 pause "Press [Enter] key to delete the group ${GROUP_NAME}"
 az group delete --resource-group ${GROUP_NAME} --yes --no-wait

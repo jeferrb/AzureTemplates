@@ -1,9 +1,9 @@
 #!/bin/bash
 set -x
 
+SMALL=1
 NUMBER_REPETITIONS=${1}
-SUBNET_HOSTS=${2}
-BIN_PATH=${3}
+BIN_PATH=${2}
 
 # run_bench(bench, class, nprocs, repetitions, path)
 run_bench() {
@@ -27,11 +27,20 @@ run_bench() {
   killall sar
 }
 
-for class in A B C D; do
-    echo "The cool class is ${class}"
-    run_bench lu "${class}" 32 ${NUMBER_REPETITIONS} ${SUBNET_HOSTS} ${BIN_PATH}
-    run_bench sp "${class}" 25 ${NUMBER_REPETITIONS} ${SUBNET_HOSTS} ${BIN_PATH}
-    run_bench sp "${class}" 36 ${NUMBER_REPETITIONS} ${SUBNET_HOSTS} ${BIN_PATH}
-    run_bench bt "${class}" 25 ${NUMBER_REPETITIONS} ${SUBNET_HOSTS} ${BIN_PATH}
-    run_bench bt "${class}" 36 ${NUMBER_REPETITIONS} ${SUBNET_HOSTS} ${BIN_PATH}
-done
+if [[ ${SMALL} ]]; then
+  for class in S; do
+    run_bench lu "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench sp "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench sp "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+  done
+else
+  for class in A B C D; do
+    run_bench lu "${class}" 32 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench sp "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench sp "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench bt "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
+    run_bench bt "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
+  done
+fi
