@@ -5,7 +5,7 @@
 GROUP_NAME=mpi${3}
 NUMBER_INSTANCES=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
-NUMBER_REPETITIONS=5
+NUMBER_REPETITIONS=1
 NUMBER_RROCESSORS=2
 declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
 # VM_SIZE=${VM_SIZES[${3}]}
@@ -65,11 +65,15 @@ pause "Press [Enter] key to execute"
 # SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
 # echo "${SUBNET_HOSTS}" > hostfile
 seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
-scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
+rm known_hosts
+for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+    ssh-keyscan -H "10.0.0.${host}" >> known_hosts
+done
+scp scripts/run_bench.sh hostfile known_hosts ${SSH_ADDR}:
 ssh ${SSH_ADDR} << EOF
     set -x
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        ssh-keyscan -H "10.0.0.${host}" >> ~/.ssh/known_hosts
+        ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
@@ -79,7 +83,7 @@ scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.sa" ${RESULTS_DIRECTORY}
 
 pause "Press [Enter] key to delete the group ${GROUP_NAME}"
-az group delete --resource-group ${GROUP_NAME} --yes --no-wait
+# az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 
 
 ###########
