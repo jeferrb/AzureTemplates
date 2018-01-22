@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-SMALL=1
+SMALL=
 NUMBER_REPETITIONS=${1}
 BIN_PATH=${2}
 

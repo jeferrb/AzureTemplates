@@ -6,7 +6,7 @@ set -x
 GROUP_NAME=mpi${3}
 NUMBER_INSTANCES=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
-NUMBER_REPETITIONS=1
+NUMBER_REPETITIONS=5
 NUMBER_RROCESSORS=2
 declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
 # VM_SIZE=${VM_SIZES[${3}]}
@@ -24,8 +24,10 @@ date > file.log
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
 
-if [ -d "~/.ssh/id_rsa.pub" ]; then
+FILE=~/.ssh/id_rsa.pub
+if [ ! -e "$FILE" ]; then
     # if there is not an rsa key, create it
+    echo "File $FILE does not exist"
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
 
@@ -64,6 +66,8 @@ pause "Press [Enter] key to execute"
 
 # SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
 # echo "${SUBNET_HOSTS}" > hostfile
+
+### OSX Only
 # seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
 
 rm hostfile
@@ -90,6 +94,10 @@ echo "az group delete --resource-group ${GROUP_NAME} --yes --no-wait"
 # pause "Press [Enter] key to delete the group ${GROUP_NAME}"
 # az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 
+FILE=~/*mountpoint/
+if [ -e "$FILE" ]; then
+    cp -r results "$FILE/results_$(whoami)$(date +%s)"
+fi
 
 ###########
 if [[ $50 ]]; then
