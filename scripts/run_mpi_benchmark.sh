@@ -2,7 +2,7 @@
 
 # the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the GroupName
 
-GROUP_NAME=mpi${VM_SIZE}
+GROUP_NAME=mpi${3}
 NUMBER_INSTANCES=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
 NUMBER_REPETITIONS=5

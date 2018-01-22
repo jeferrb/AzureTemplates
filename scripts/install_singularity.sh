@@ -4,7 +4,7 @@ VERSION=2.4
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc
 # For mpich do: sudo apt-get install mpich libmpich-dev libhdf5-mpich-dev
 
 # wget -q https://www.open-mpi.org/software/ompi/v3.0/downloads/openmpi-3.0.0.tar.gz
@@ -42,3 +42,22 @@ echo "${1}" > pass
 sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/username/mymountpoint cifs nofail,vers=3.0,username=test1diag281,password=`cat pass`,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
 rm -rf pass
 sudo mount -a
+
+
+
+################
+# for the host machine, install Azure CLI
+if [[ 0 ]]; then
+	# Install required dependencies
+	sudo apt-get update && sudo apt-get install -y libssl-dev libffi-dev python-dev build-essential
+	# Install the CLI with curl
+	curl -L https://aka.ms/InstallAzureCli | bash
+	# restart your shell
+	exec -l $SHELL
+	# clear your shell's command hash cache
+	hash -r
+fi
+
+
+
+
