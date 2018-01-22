@@ -14,8 +14,8 @@ VM_SIZE=${VM_SIZES[0]}
 RESULTS_DIRECTORY="results/${VM_SIZE}_result"
 
 function pause(){
-    read -p "$*"
-    # echo "$*"
+    # read -p "$*"
+    echo "$*"
 }
 
 echo "------------------------------------------"  >> file.log.old
@@ -44,7 +44,7 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     # scp ${SSH_ADDR} ~/.ssh/id_rsa.pub id_rsa${i}.pub
 done
 
-pause "Press [Enter] key to continue"
+# pause "Press [Enter] key to continue"
 
 
 echo "******************************************"  >> file.log
@@ -61,7 +61,7 @@ EOF
 scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator.pub
 grep "ssh " file.log | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_coodinator.pub
 
-pause "Press [Enter] key to execute"
+# pause "Press [Enter] key to execute"
 
 
 # SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
