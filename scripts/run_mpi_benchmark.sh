@@ -10,7 +10,7 @@ NUMBER_RROCESSORS=2
 declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
 # VM_SIZE=${VM_SIZES[${3}]}
 VM_SIZE=${VM_SIZES[0]}
-RESULTS_DIRECTORY="${VM_SIZE}_result"
+RESULTS_DIRECTORY="results/${VM_SIZE}_result"
 set -x
 
 function pause(){
@@ -65,11 +65,8 @@ pause "Press [Enter] key to execute"
 # SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
 # echo "${SUBNET_HOSTS}" > hostfile
 seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
-rm known_hosts
-for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-    ssh-keyscan -H "10.0.0.${host}" >> known_hosts
-done
-scp scripts/run_bench.sh hostfile known_hosts ${SSH_ADDR}:
+scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
+rm hostfile
 ssh ${SSH_ADDR} << EOF
     set -x
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
@@ -78,30 +75,33 @@ ssh ${SSH_ADDR} << EOF
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
 EOF
-mkdir ${RESULTS_DIRECTORY}
+mkdir -p ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.sa" ${RESULTS_DIRECTORY}
 
-pause "Press [Enter] key to delete the group ${GROUP_NAME}"
+echo "To tedelete the resource type:"
+echo "az group delete --resource-group ${GROUP_NAME} --yes --no-wait"
+# pause "Press [Enter] key to delete the group ${GROUP_NAME}"
 # az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 
 
 ###########
-for (( i = 0; i < 0; i++ )); do
+if [[ $50 ]]; then
+    #statements
     # mpirun -np 20 singularity exec ./mpi_sample  mymountpoint/ubuntu.img
     # mpirun -np 5 -host 10.0.0.5, 10.0.0.4 ./mpi_sample
 
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
 
     # ssh -o StrictHostKeyChecking=no username@hostname.com
-    ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null username@hostname.com
+    # ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null username@hostname.com
 
-    ssh-keygen -R [hostname]
-    ssh-keygen -R [ip_address]
-    ssh-keygen -R [hostname],[ip_address]
-    ssh-keyscan -H [hostname],[ip_address] >> ~/.ssh/known_hosts
-    ssh-keyscan -H [ip_address] >> ~/.ssh/known_hosts
-    ssh-keyscan -H [hostname] >> ~/.ssh/known_hosts
+    # ssh-keygen -R [hostname]
+    # ssh-keygen -R [ip_address]
+    # ssh-keygen -R [hostname],[ip_address]
+    # ssh-keyscan -H [hostname],[ip_address] >> ~/.ssh/known_hosts
+    # ssh-keyscan -H [ip_address] >> ~/.ssh/known_hosts
+    # ssh-keyscan -H [hostname] >> ~/.ssh/known_hosts
 
         # mpirun -np ${NUMBER_INSTANCES} -host ${SUBNET_HOSTS} ./mymountpoint/NPB3.3-MPI/bin/sp.S.16 >> remote.log
 
@@ -109,4 +109,5 @@ for (( i = 0; i < 0; i++ )); do
 # echo "=========================================="  >> results.log
 # -------> cat remote.log >> results.log
 # echo "=========================================="  >> results.log
-done
+fi
+

@@ -4,3 +4,4 @@
 *.pub
 *.out
 hostfile
+results/*
