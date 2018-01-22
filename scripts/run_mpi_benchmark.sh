@@ -26,7 +26,7 @@ az group create --name $GROUP_NAME --location "South Central US"
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     echo "Creating the machine number $i"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
-    az group deployment create --name SingularityTest --resource-group $GROUP_NAME \
+    az group deployment create --name "SingularityTest$(whoami)" --resource-group $GROUP_NAME \
     --template-file azuredeploy.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${i}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${i}" \
     adminPassword=$1 scriptParameterPassMount=$2 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> file.log
     SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
