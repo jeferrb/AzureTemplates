@@ -14,6 +14,7 @@ set -x
 
 function pause(){
     # read -p "$*"
+    echo "$*"
 }
 
 echo "------------------------------------------"  >> file.log.old
@@ -57,12 +58,12 @@ pause "Press [Enter] key to execute"
 
 # SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
 # echo "${SUBNET_HOSTS}" > hostfile
-# scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
-seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed 's/n/ slots=${NUMBER_RROCESSORS}n/g' | tr 'n' '\n' > hostfile
+seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
+scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
 ssh ${SSH_ADDR} << EOF
     set -x
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        ssh-keyscan -H 10.0.0.${host} >> ~/.ssh/known_hosts
+        ssh-keyscan -H 10.0.0."${host}" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
