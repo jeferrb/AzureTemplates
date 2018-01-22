@@ -2,6 +2,7 @@
 
 # the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the GroupName
 
+set -x
 GROUP_NAME=mpi${3}
 NUMBER_INSTANCES=3
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
@@ -11,11 +12,10 @@ declare -a VM_SIZES=('Standard_D2s_v3' 'Standard_NC6')
 # VM_SIZE=${VM_SIZES[${3}]}
 VM_SIZE=${VM_SIZES[0]}
 RESULTS_DIRECTORY="results/${VM_SIZE}_result"
-# set -x
 
 function pause(){
-    # read -p "$*"
-    echo "$*"
+    read -p "$*"
+    # echo "$*"
 }
 
 echo "------------------------------------------"  >> file.log.old
@@ -64,9 +64,15 @@ pause "Press [Enter] key to execute"
 
 # SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
 # echo "${SUBNET_HOSTS}" > hostfile
-seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
-scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
+# seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
+
 rm hostfile
+for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
+    echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> hostfile
+done
+
+scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
+# rm hostfile
 ssh ${SSH_ADDR} << EOF
     set -x
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
