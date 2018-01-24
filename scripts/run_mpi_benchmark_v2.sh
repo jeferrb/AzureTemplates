@@ -26,16 +26,12 @@ date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
 
-pause "Press [Enter] key to continue"
-
 FILE=~/.ssh/id_rsa.pub
 if [ ! -e "$FILE" ]; then
     # if there is not an rsa key, create it
     echo "File $FILE does not exist"
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
-
-pause "Press [Enter] key to continue"
 
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     echo "Creating the machine number $i"
@@ -47,7 +43,7 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     if [ ! $? -eq 0 ]; then
         echo "Faile to create some VM instace, reverting changes"
         az group delete --resource-group ${GROUP_NAME} --yes --no-wait
-    if
+    fi
     SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     if [[ -z "${SSH_ADDR}" ]]; then
         echo "Faile to create a VM instace, reverting changes"
@@ -59,8 +55,6 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
     # scp ${SSH_ADDR} ~/.ssh/id_rsa.pub id_rsa${i}.pub
 done
-
-pause "Press [Enter] key to continue"
 
 
 echo "******************************************"  >> ${LOG_FILE}
