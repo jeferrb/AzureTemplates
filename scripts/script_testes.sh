@@ -18,8 +18,8 @@ declare -a TYPES=("host" "singularity")
 REPETITIONS=10
 
 for benchmark in `seq 1 ${#NAMES[@]}`; do
-	local NAME=${NAMES[benchmark]}
-	local EXECUTABLE=bin/${EXECUTABLES[benchmark]}
+	NAME=${NAMES[benchmark]}
+	EXECUTABLE=bin/${EXECUTABLES[benchmark]}
 	cd ${ROOT_DIR}/${DIRECTORIES[benchmark]}
 	echo "Going to run $NAME $EXECUTABLE on $PWD"
 	if [ ! -e ${EXECUTABLE} ]; then
