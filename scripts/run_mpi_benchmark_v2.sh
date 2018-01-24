@@ -13,15 +13,16 @@ VM_SIZE=${VM_SIZES[${3}]}
 NUMBER_RROCESSORS=${VM_CORES[${3}]}
 # VM_SIZE=${VM_SIZES[0]}
 RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_result"
+LOG_FILE=logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log
 
 function pause(){
     # read -p "$*"
     echo "$*"
 }
 
-echo "------------------------------------------"  >> file.log.old
-cat file.log >> file.log.old
-date > file.log
+echo "------------------------------------------"  >> ${LOG_FILE}.old
+cat ${LOG_FILE} >> ${LOG_FILE}.old
+date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
 
@@ -38,8 +39,8 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
     --template-file azuredeploy_multiple_from_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${i}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${i}" \
-    adminPassword=$1 scriptParameterPassMount=$2 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> file.log
-    SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+    adminPassword=$1 scriptParameterPassMount=$2 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
+    SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
     # Add all credential do cop the host public key later
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
@@ -49,10 +50,10 @@ done
 # pause "Press [Enter] key to continue"
 
 
-echo "******************************************"  >> file.log
+echo "******************************************"  >> ${LOG_FILE}
 
-# grep "ssh " file.log
-SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+# grep "ssh " ${LOG_FILE}
+SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 # HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
 # ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
 
@@ -60,9 +61,9 @@ SSH_ADDR=`grep "ssh " file.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 ssh ${SSH_ADDR} << EOF
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 EOF
-scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator.pub
-grep "ssh " file.log | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_coodinator.pub
-
+scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator_${GROUP_NAME}.pub
+grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_coodinator_${GROUP_NAME}.pub
+rm id_rsa_coodinator_${GROUP_NAME}.pub
 # pause "Press [Enter] key to execute"
 
 
