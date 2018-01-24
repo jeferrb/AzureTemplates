@@ -39,6 +39,8 @@
     export PATH=/usr/local/cuda-9.1/bin${PATH:+:${PATH}}
     export LD_LIBRARY_PATH=/usr/local/cuda-9.1/lib64\${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
+    sudo apt install ocl-icd-opencl-dev
+
 #Reboot the VM and proceed to verify the installation.
 
 #For updates:

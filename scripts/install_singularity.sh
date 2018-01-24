@@ -42,7 +42,10 @@ echo "${1}" > pass
 sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/username/mymountpoint cifs nofail,vers=3.0,username=test1diag281,password=`cat pass`,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
 rm pass
 sudo mount -a
-cp /home/username/mymountpoint/ubuntu.img /home/username/
+
+# cp /home/username/mymountpoint/ubuntu.img /home/username/
+
+# singularity pull shub://ruycastilho/GPUtest:1604
 
 ################
 # for the host machine, install Azure CLI
