@@ -47,7 +47,7 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     if [ ! $? -eq 0 ]; then
         echo "Faile to create some VM instace, reverting changes"
         az group delete --resource-group ${GROUP_NAME} --yes --no-wait
-    else
+    if
     SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     if [[ -z "${SSH_ADDR}" ]]; then
         echo "Faile to create a VM instace, reverting changes"
