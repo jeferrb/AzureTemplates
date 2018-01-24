@@ -16,8 +16,8 @@ RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_result"
 LOG_FILE=logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log
 
 function pause(){
-    # read -p "$*"
-    echo "$*"
+    read -p "$*"
+    # echo "$*"
 }
 
 echo "------------------------------------------"  >> ${LOG_FILE}.old
@@ -26,12 +26,16 @@ date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
 
+pause "Press [Enter] key to continue"
+
 FILE=~/.ssh/id_rsa.pub
 if [ ! -e "$FILE" ]; then
     # if there is not an rsa key, create it
     echo "File $FILE does not exist"
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
+
+pause "Press [Enter] key to continue"
 
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     echo "Creating the machine number $i"
@@ -40,14 +44,23 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
     --template-file azuredeploy_multiple_from_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${i}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${i}" \
     adminPassword=$1 scriptParameterPassMount=$2 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
+    if [ ! $? -eq 0 ]; then
+        echo "Faile to create some VM instace, reverting changes"
+        az group delete --resource-group ${GROUP_NAME} --yes --no-wait
+    else
     SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+    if [[ -z "${SSH_ADDR}" ]]; then
+        echo "Faile to create a VM instace, reverting changes"
+        az group delete --resource-group ${GROUP_NAME} --yes --no-wait
+    fi
     HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
     # Add all credential do cop the host public key later
+    ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
     # scp ${SSH_ADDR} ~/.ssh/id_rsa.pub id_rsa${i}.pub
 done
 
-# pause "Press [Enter] key to continue"
+pause "Press [Enter] key to continue"
 
 
 echo "******************************************"  >> ${LOG_FILE}
