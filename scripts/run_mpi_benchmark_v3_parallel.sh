@@ -57,7 +57,7 @@ if [ ! -e "$FILE" ]; then
 fi
 
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
-    createMachines $i $1 $2
+    createMachines $i $1 $2 &
 done
 wait
 
