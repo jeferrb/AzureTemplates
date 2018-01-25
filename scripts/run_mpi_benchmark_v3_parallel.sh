@@ -32,7 +32,8 @@ createMachines(){
     ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
     ssh ${SSH_ADDR} << EOF
-        rm ~/.ssh/known_hosts
+        FILE=~/.ssh/known_hosts
+        rm ~/.ssh/${FILE}
     EOF
     cat ${LOG_FILE}_${1} >> ${LOG_FILE}
     rm ${LOG_FILE}_${1}
