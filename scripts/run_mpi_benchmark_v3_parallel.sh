@@ -11,7 +11,6 @@ declare -a VM_SIZES=("Basic_A0" "Basic_A1" "Basic_A2" "Basic_A3" "Basic_A4" "Sta
 declare -a VM_CORES=("1" "1" "2" "4" "8" "1" "1" "1" "8" "16" "2" "2" "2" "4" "8" "4" "4" "2" "4" "8" "8" "8" "8" "16" "1" "1" "2" "2" "4" "8" "1" "1" "2" "2" "2" "4" "4" "4" "8" "8" "8" "16" "16" "16" "20" "16" "16" "2" "2" "2" "2" "2" "4" "4" "4" "32" "32" "8" "8" "8" "4" "4" "16" "16" "64" "64" "8" "8" "1" "1" "2" "2" "2" "4" "4" "4" "8" "8" "8" "8" "8" "16" "16" "16" "16" "16" "20" "2" "2" "2" "4" "4" "4" "8" "8" "8" "16" "16" "16" "16" "2" "2" "32" "32" "32" "32" "4" "4" "64" "64" "64" "64" "8" "8" "1" "16" "16" "1" "2" "2" "4" "4" "8" "8" "16" "16" "16" "16" "8" "8" "12" "12" "24" "24" "24" "24" "6" "6" "12" "24" "6")
 VM_SIZE=${VM_SIZES[${3}]}
 NUMBER_RROCESSORS=${VM_CORES[${3}]}
-# VM_SIZE=${VM_SIZES[0]}
 RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_result"
 LOG_FILE=logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log
 
@@ -26,17 +25,14 @@ createMachines(){
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
     --template-file azuredeploy_multiple_from_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
-    adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
-    if [ ! $? -eq 0 ]; then
-        echo "Faile to create some VM instace, reverting changes"
-        az group delete --resource-group ${GROUP_NAME} --yes --no-wait
-    fi
-    SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
-    HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
+    adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}
+    local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+    local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
     # Add all credential do cop the host public key later
     ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
-    # scp ${SSH_ADDR} ~/.ssh/id_rsa.pub id_rsa${i}.pub
+    cat ${LOG_FILE}_${1} >> ${LOG_FILE}
+    rm ${LOG_FILE}_${1}
 }
 
 
@@ -46,7 +42,8 @@ date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
 if [ ! $? -eq 0 ]; then
-    echo "Faile to create group ${GROUP_NAME}, reverting changes"
+    echo "Faile to create group ${GROUP_NAME} exiting"
+    exit
 fi
 
 FILE=~/.ssh/id_rsa.pub
@@ -65,24 +62,27 @@ echo "******************************************"  >> ${LOG_FILE}
 
 # grep "ssh " ${LOG_FILE}
 SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
-# HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
-# ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
+if [[ -z "${SSH_ADDR}" ]]; then
+    echo "Faile to create a VM instace, reverting changes"
+    az group delete --resource-group ${GROUP_NAME} --yes --no-wait
+fi
 
-# copy coordinator (master) credential to all slaves
+# Create an id RSA for the coordenator
 ssh ${SSH_ADDR} << EOF
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+    FILE=~/.ssh/id_rsa.pub
+    if [ ! -e "\$FILE" ]; then
+        # if there is not an rsa key, create it
+        echo "File \$FILE does not exist"
+        ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+    fi
 EOF
+
+# copy coordinator (master) credential to all slaves
 scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator_${GROUP_NAME}.pub
 grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_coodinator_${GROUP_NAME}.pub
 rm id_rsa_coodinator_${GROUP_NAME}.pub
 # pause "Press [Enter] key to execute"
-
-
-# SUBNET_HOSTS=`seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /n10.0.0./g' | cut -c 3- | rev | cut -c 9-| rev`
-# echo "${SUBNET_HOSTS}" > hostfile
-
-### OSX Only
-# seq 3 $(echo ${NUMBER_INSTANCES}+3 | bc) | tr '\n'  " "  | sed 's/ /\n10.0.0./g' | cut -c 3- | rev | cut -c 8-| rev | sed "s/n/ slots=${NUMBER_RROCESSORS}n/g" | tr 'n' '\n' > hostfile
 
 rm hostfile
 for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
@@ -93,8 +93,9 @@ scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
 # rm hostfile
 ssh ${SSH_ADDR} << EOF
     set -x
+    rm ~/.ssh/known_hosts
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        ssh-keygen -R "10.0.0.\${host}"
+        # ssh-keygen -R "10.0.0.\${host}"
         ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
@@ -105,11 +106,11 @@ scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.sa" ${RESULTS_DIRECTORY}
 
 echo "To tedelete the resource type:"
-echo "az group delete --resource-group ${GROUP_NAME} --yes --no-wait"
+# echo "az group delete --resource-group ${GROUP_NAME} --yes --no-wait"
 # pause "Press [Enter] key to delete the group ${GROUP_NAME}"
 az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 
-FILE=~/*mountpoint/
-if [ -e "$FILE" ]; then
+FILE=~/mountpoint/
+if [ -d "$FILE" ]; then
     cp -r results "$FILE/results_$(whoami)$(date +%s)"
 fi
