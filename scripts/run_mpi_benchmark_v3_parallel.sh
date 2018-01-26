@@ -28,11 +28,12 @@ createMachines(){
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}
     local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
+    sleep 180
     # Add all credential do cop the host public key later
     ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
     echo "" > known_hosts
-    scp known_hosts ${HOST_ADDR}:known_hosts
+    # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
     cat ${LOG_FILE}_${1} >> ${LOG_FILE}
     rm ${LOG_FILE}_${1}
     echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> hostfile
@@ -63,7 +64,7 @@ done
 wait
 
 # da uns 3 minutinho pras maquina ser criada
-sleep 180
+# sleep 180
 
 echo "******************************************"  >> ${LOG_FILE}
 
@@ -74,16 +75,16 @@ if [[ -z "${SSH_ADDR}" ]]; then
     az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 fi
 
-# Create an id RSA for the coordenator
-ssh ${SSH_ADDR} << EOF
-    ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-    FILE=~/.ssh/id_rsa.pub
-    if [ ! -e "\$FILE" ]; then
-        # if there is not an rsa key, create it
-        echo "File \$FILE does not exist"
-        ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-    fi
-EOF
+# Create an id RSA for the coordenator # Do it just if the next scp fails
+# ssh ${SSH_ADDR} << EOF
+#     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+#     FILE=~/.ssh/id_rsa.pub
+#     if [ ! -e "\$FILE" ]; then
+#         # if there is not an rsa key, create it
+#         echo "File \$FILE does not exist"
+#         ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+#     fi
+# EOF
 
 # copy coordinator (master) credential to all slaves
 scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator_${GROUP_NAME}.pub
