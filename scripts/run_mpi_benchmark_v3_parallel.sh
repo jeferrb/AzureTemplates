@@ -57,9 +57,13 @@ if [ ! -e "$FILE" ]; then
 fi
 rm hostfile
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
-    createMachines $i $1 $2 # &
+    createMachines $i $1 $2 &
+    sleep 13
 done
 wait
+
+# da uns 3 minutinho pras maquina ser criada
+sleep 180
 
 echo "******************************************"  >> ${LOG_FILE}
 
