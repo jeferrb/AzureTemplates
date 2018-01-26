@@ -36,9 +36,11 @@ createMachines(){
     # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
     cat ${LOG_FILE}_${1} >> ${LOG_FILE}
     rm ${LOG_FILE}_${1}
-    # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> hostfile
+    # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> ${GROUP_NAME}/hostfile
 }
 
+
+mkdir ${GROUP_NAME}
 
 echo "------------------------------------------"  >> ${LOG_FILE}.old
 cat ${LOG_FILE} >> ${LOG_FILE}.old
@@ -50,13 +52,14 @@ if [ ! $? -eq 0 ]; then
     exit
 fi
 
-FILE=~/.ssh/id_rsa.pub
-if [ ! -e "$FILE" ]; then
-    # if there is not an rsa key, create it
-    echo "File $FILE does not exist"
-    ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-fi
-rm hostfile
+# FILE=~/.ssh/id_rsa.pub
+# if [ ! -e "$FILE" ]; then
+#     # if there is not an rsa key, create it
+#     echo "File $FILE does not exist"
+#     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+# fi
+
+rm ${GROUP_NAME}/hostfile
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     createMachines $i $1 $2 &
     sleep 13
@@ -87,18 +90,18 @@ fi
 # EOF
 
 # copy coordinator (master) credential to all slaves
-scp ${SSH_ADDR}:~/.ssh/id_rsa.pub id_rsa_coodinator_${GROUP_NAME}.pub
-grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i id_rsa_coodinator_${GROUP_NAME}.pub
-rm id_rsa_coodinator_${GROUP_NAME}.pub
+scp ${SSH_ADDR}:~/.ssh/id_rsa.pub ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
+grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
+rm ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
 # pause "Press [Enter] key to execute"
 
-# rm hostfile
+# rm ${GROUP_NAME}/hostfile
 for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
-    echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> hostfile
+    echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${GROUP_NAME}/hostfile
 done
 
-scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
-# rm hostfile
+scp scripts/run_bench.sh ${GROUP_NAME}/hostfile ${SSH_ADDR}:
+# rm ${GROUP_NAME}/hostfile
 ssh ${SSH_ADDR} << EOF
     set -x
     # rm ~/.ssh/known_hosts
@@ -115,12 +118,11 @@ mkdir -p ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.sa" ${RESULTS_DIRECTORY}
 
-echo "To tedelete the resource type:"
-# echo "az group delete --resource-group ${GROUP_NAME} --yes --no-wait"
 # pause "Press [Enter] key to delete the group ${GROUP_NAME}"
+echo "To tedeleting the resource type:"
 az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 
-FILE=~/mountpoint/
-if [ -d "$FILE" ]; then
-    cp -r results "$FILE/results_$(whoami)$(date +%s)"
+MOUNTPOINT=~/mountpoint/
+if [ -d "$MOUNTPOINT" ]; then
+    cp -r results "$MOUNTPOINT/results_$(whoami)$(date +%s)"
 fi
