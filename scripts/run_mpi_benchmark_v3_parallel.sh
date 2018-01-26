@@ -36,7 +36,7 @@ createMachines(){
     # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
     cat ${LOG_FILE}_${1} >> ${LOG_FILE}
     rm ${LOG_FILE}_${1}
-    echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> hostfile
+    # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> hostfile
 }
 
 
@@ -93,9 +93,9 @@ rm id_rsa_coodinator_${GROUP_NAME}.pub
 # pause "Press [Enter] key to execute"
 
 # rm hostfile
-# for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
-#     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> hostfile
-# done
+for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
+    echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> hostfile
+done
 
 scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
 # rm hostfile
@@ -103,10 +103,10 @@ ssh ${SSH_ADDR} << EOF
     set -x
     # rm ~/.ssh/known_hosts
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        # ssh-keygen -R "10.0.0.\${host}"
-        # ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
-        ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
-        ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
+        ssh-keygen -R "10.0.0.\${host}"
+        ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
+        # ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
+        # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
