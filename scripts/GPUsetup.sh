@@ -24,7 +24,7 @@
     sudo cp /etc/nvidia/gridd.conf.template /etc/nvidia/gridd.conf
 
 #Add the following to /etc/nvidia/gridd.conf:
-    echo "IgnoreSP=TRUE" >> /etc/nvidia/gridd.conf
+    sudo echo "IgnoreSP=TRUE" >> /etc/nvidia/gridd.conf
 
 #Cuda:
 

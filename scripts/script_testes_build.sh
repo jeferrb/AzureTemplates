@@ -137,18 +137,6 @@ cd bin/
 cmake -DCMAKE_BUILD_TYPE="Release" ../ && make -j
 
 
-#CRS-DE-OpenCL
-cd $ROOT_DIR/
-NAME=OpenCL
-cd ${ROOT_DIR}/${PROGRAM}/${NAME}/
-if [ ! -d "bin" ]; then
-  mkdir bin
-fi
-cd bin/
-cmake -DCMAKE_BUILD_TYPE="Release" ../ && make -j
-cd $ROOT_DIR/
-
-
 #CRS-OpenMP
 cd $ROOT_DIR/
 NAME=OpenMP
@@ -160,3 +148,15 @@ cd bin/
 cmake -DCMAKE_BUILD_TYPE="Release" ../ && make -j
 
 cd $ROOT_DIR/
+
+
+# #CRS-DE-OpenCL
+# cd $ROOT_DIR/
+# NAME=OpenCL
+# cd ${ROOT_DIR}/${PROGRAM}/${NAME}/
+# if [ ! -d "bin" ]; then
+#   mkdir bin
+# fi
+# cd bin/
+# cmake -DCMAKE_BUILD_TYPE="Release" ../ && make -j
+# cd $ROOT_DIR/

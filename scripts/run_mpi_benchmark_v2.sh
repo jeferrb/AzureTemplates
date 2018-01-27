@@ -45,10 +45,10 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
         az group delete --resource-group ${GROUP_NAME} --yes --no-wait
     fi
     SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
-    if [[ -z "${SSH_ADDR}" ]]; then
-        echo "Faile to create a VM instace, reverting changes"
-        az group delete --resource-group ${GROUP_NAME} --yes --no-wait
-    fi
+    # if [[ -z "${SSH_ADDR}" ]]; then
+    #     echo "Faile to create a VM instace, reverting changes"
+    #     az group delete --resource-group ${GROUP_NAME} --yes --no-wait
+    # fi
     HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
     # Add all credential do cop the host public key later
     ssh-keygen -R ${HOST_ADDR}
@@ -90,6 +90,7 @@ scp scripts/run_bench.sh hostfile ${SSH_ADDR}:
 ssh ${SSH_ADDR} << EOF
     set -x
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+        ssh-keygen -R "10.0.0.\${host}"
         ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
