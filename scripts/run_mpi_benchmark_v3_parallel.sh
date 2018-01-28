@@ -28,12 +28,12 @@ createMachines(){
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}
     local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
-    sleep 18
+    sleep 120
     # Add all credential do cop the host public key later
-    # ssh-keygen -R ${HOST_ADDR}
-    # ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
-    # echo "" > known_hosts
-    # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
+    ssh-keygen -R ${HOST_ADDR}
+    ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
+    echo "" > known_hosts
+    scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
     cat ${LOG_FILE}_${1} >> ${LOG_FILE}
     rm ${LOG_FILE}_${1}
     # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> ${GROUP_NAME}/hostfile
@@ -105,12 +105,15 @@ scp scripts/run_bench.sh ${GROUP_NAME}/hostfile ${SSH_ADDR}:
 ssh ${SSH_ADDR} << EOF
     set -x
     rm ~/.ssh/known_hosts
-    # for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-    #     ssh-keygen -R "10.0.0.\${host}"
-    #     # ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
-    #     # ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
-    #     # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
-    # done
+    ssh-keygen -f "/home/username/.ssh/known_hosts" -R
+    echo "" > known_hosts
+    for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+        scp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
+        # ssh-keygen -R "10.0.0.\${host}"
+        # ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hostsscp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
+        # ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
+        # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
+    done
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
 EOF
