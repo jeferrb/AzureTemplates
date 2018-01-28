@@ -28,11 +28,11 @@ createMachines(){
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}
     local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
-    sleep 180
+    sleep 18
     # Add all credential do cop the host public key later
-    ssh-keygen -R ${HOST_ADDR}
-    ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
-    echo "" > known_hosts
+    # ssh-keygen -R ${HOST_ADDR}
+    # ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
+    # echo "" > known_hosts
     # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
     cat ${LOG_FILE}_${1} >> ${LOG_FILE}
     rm ${LOG_FILE}_${1}
@@ -42,8 +42,6 @@ createMachines(){
 
 mkdir ${GROUP_NAME}
 
-echo "------------------------------------------"  >> ${LOG_FILE}.old
-cat ${LOG_FILE} >> ${LOG_FILE}.old
 date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
 az group create --name $GROUP_NAME --location "South Central US"
@@ -62,7 +60,7 @@ fi
 rm ${GROUP_NAME}/hostfile
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     createMachines $i $1 $2 &
-    sleep 13
+    sleep 4
 done
 wait
 
@@ -89,6 +87,8 @@ fi
 #     fi
 # EOF
 
+grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev | xargs -L1 ssh-keygen -R
+grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev | xargs -L1 ssh-keyscan -H >> ~/.ssh/known_hosts
 # copy coordinator (master) credential to all slaves
 scp ${SSH_ADDR}:~/.ssh/id_rsa.pub ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
 grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub

@@ -48,7 +48,7 @@ for benchmark in `seq 1 ${#NAMES[@]}`; do
 	fi
 	TYPE=host
 	for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-c0 ${PARAM_C0} \
 		-c1 ${PARAM_C1} \
 		-nc ${PARAM_NC} \
@@ -57,12 +57,13 @@ for benchmark in `seq 1 ${#NAMES[@]}`; do
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 	done
 	TYPE=singularity
-	singularity exec --nv $IMAGE_PATH bash -c "\
+		cat << EOF > execute.sh
+		#!/bin/bash
 		for i in 1 .. $REPETITIONS; do
-			{ time ( ./$EXECUTABLE \
+			time ( ./$EXECUTABLE \
 			-c0 ${PARAM_C0} \
 			-c1 ${PARAM_C1} \
 			-nc ${PARAM_NC} \
@@ -71,8 +72,12 @@ for benchmark in `seq 1 ${#NAMES[@]}`; do
 			-v ${PARAM_V} \
 			-i $DATASET ) \
 			>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-			} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-		done "
+			2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+		done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 done
 
 
@@ -85,7 +90,7 @@ cd ${ROOT_DIR}/CMP/OpenCL
 TYPE=host
 
 for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-c0 ${PARAM_C0} \
 	-c1 ${PARAM_C1} \
 	-nc ${PARAM_NC} \
@@ -95,14 +100,15 @@ for i in 1 .. $REPETITIONS; do
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 done
 
 TYPE=singularity
 
-singularity exec --nv $IMAGE_PATH bash -c "\
+cat << EOF > execute.sh
+#!/bin/bash
 	for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-c0 ${PARAM_C0} \
 	-c1 ${PARAM_C1} \
 	-nc ${PARAM_NC} \
@@ -112,8 +118,12 @@ singularity exec --nv $IMAGE_PATH bash -c "\
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-done"
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 
 
 #CRS-CUDA
@@ -124,7 +134,7 @@ cd ${ROOT_DIR}/CRS/CUDA
 TYPE=host
 
 for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
 	-na ${PARAM_NA} \
@@ -140,14 +150,15 @@ for i in 1 .. $REPETITIONS; do
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 done
 
 TYPE=singularity
 
-singularity exec --nv $IMAGE_PATH bash -c "\
+cat << EOF > execute.sh
+#!/bin/bash
 	for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
 	-na ${PARAM_NA} \
@@ -163,8 +174,12 @@ singularity exec --nv $IMAGE_PATH bash -c "\
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-done"
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 
 
 if [[ ! -z "${OPENACC}" ]]; then
@@ -177,7 +192,7 @@ if [[ ! -z "${OPENACC}" ]]; then
 	TYPE=host
 
 	for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-a0 ${PARAM_A0} \
 		-a1 ${PARAM_A1} \
 		-na ${PARAM_NA} \
@@ -193,14 +208,15 @@ if [[ ! -z "${OPENACC}" ]]; then
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 	done
 
 	TYPE=singularity
 
-	singularity exec --nv $IMAGE_PATH bash -c "\
+		cat << EOF > execute.sh
+		#!/bin/bash
 		for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-a0 ${PARAM_A0} \
 		-a1 ${PARAM_A1} \
 		-na ${PARAM_NA} \
@@ -216,8 +232,12 @@ if [[ ! -z "${OPENACC}" ]]; then
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-	done"
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 fi
 
 #CRS-OpenCL
@@ -228,7 +248,7 @@ cd ${ROOT_DIR}/CRS/OpenCL
 TYPE=host
 
 for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
 	-na ${PARAM_NA} \
@@ -245,14 +265,15 @@ for i in 1 .. $REPETITIONS; do
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 done
 
 TYPE=singularity
 
-singularity exec --nv $IMAGE_PATH bash -c "\
+cat << EOF > execute.sh
+#!/bin/bash
 	for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-a0 ${PARAM_A0} \
 		-a1 ${PARAM_A1} \
 		-na ${PARAM_NA} \
@@ -269,8 +290,12 @@ singularity exec --nv $IMAGE_PATH bash -c "\
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-	done"
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 
 #CRS-OpenMP
 NAME=CRS-OpenMP
@@ -280,7 +305,7 @@ cd ${ROOT_DIR}/CRS/OpenMP
 TYPE=host
 
 for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
 	-na ${PARAM_NA} \
@@ -296,14 +321,15 @@ for i in 1 .. $REPETITIONS; do
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 done
 
 TYPE=singularity
 
-singularity exec --nv $IMAGE_PATH bash -c "\
+cat << EOF > execute.sh
+#!/bin/bash
 	for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-a0 ${PARAM_A0} \
 		-a1 ${PARAM_A1} \
 		-na ${PARAM_NA} \
@@ -319,8 +345,12 @@ singularity exec --nv $IMAGE_PATH bash -c "\
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-	done"
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 
 if [[ ! -z "${OPENACC}" ]]; then
 
@@ -332,7 +362,7 @@ if [[ ! -z "${OPENACC}" ]]; then
 	TYPE=host
 
 	for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-ngen 30 \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
@@ -349,14 +379,15 @@ if [[ ! -z "${OPENACC}" ]]; then
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 	done
 
 	TYPE=singularity
 
-	singularity exec --nv $IMAGE_PATH bash -c "\
+		cat << EOF > execute.sh
+		#!/bin/bash
 	for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-ngen 30 \
 		-a0 ${PARAM_A0} \
 		-a1 ${PARAM_A1} \
@@ -373,8 +404,12 @@ if [[ ! -z "${OPENACC}" ]]; then
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-	done"
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 fi
 
 
@@ -386,7 +421,7 @@ cd ${ROOT_DIR}/CRS-DE/OpenCL
 TYPE=host
 
 for i in 1 .. $REPETITIONS; do
-	{ time ( ./$EXECUTABLE \
+	time ( ./$EXECUTABLE \
 	-ngen 30 \
 	-azimuth 0 \
 	-a0 ${PARAM_A0} \
@@ -405,14 +440,15 @@ for i in 1 .. $REPETITIONS; do
 	-v ${PARAM_V} \
 	-i $DATASET ) \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-	} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
 done
 
 TYPE=singularity
 
-singularity exec --nv $IMAGE_PATH bash -c "\
+cat << EOF > execute.sh
+#!/bin/bash
 	for i in 1 .. $REPETITIONS; do
-		{ time ( ./$EXECUTABLE \
+		time ( ./$EXECUTABLE \
 		-ngen 30 \
 		-azimuth 0 \
 		-a0 ${PARAM_A0} \
@@ -431,14 +467,18 @@ singularity exec --nv $IMAGE_PATH bash -c "\
 		-v ${PARAM_V} \
 		-i $DATASET ) \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}.txt \
-		} 2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
-	done"
+		2> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt
+	done
+EOF
+chmod +x execute.sh
+singularity exec --nv $IMAGE_PATH ./execute.sh
+rm execute.sh
 
 
 
 
 # Original
-# { time ( ./$EXECUTABLE \
+# time ( ./$EXECUTABLE \
 # -ngen 30 \
 # -azimuth 0 \
 # -a0 -0.7e-3 \
