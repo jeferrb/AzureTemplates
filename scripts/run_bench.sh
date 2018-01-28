@@ -44,8 +44,8 @@ if [[ ${SMALL} ]]; then
     run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
   done
 else
-  # for class in A B C D; do
-  for class in A A A A; do # B C D; do
+  for class in A B C D; do
+  # for class in A ; do # B C D; do
     run_bench lu "${class}" 32 ${NUMBER_REPETITIONS} ${BIN_PATH}
     run_bench sp "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
     run_bench sp "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}

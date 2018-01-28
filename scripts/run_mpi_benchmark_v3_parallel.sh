@@ -105,7 +105,7 @@ scp scripts/run_bench.sh ${GROUP_NAME}/hostfile ${SSH_ADDR}:
 ssh ${SSH_ADDR} << EOF
     set -x
     rm ~/.ssh/known_hosts
-    ssh-keygen -f "/home/username/.ssh/known_hosts" -R
+    # ssh-keygen -f "/home/username/.ssh/known_hosts" -R
     echo "" > known_hosts
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
         scp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
