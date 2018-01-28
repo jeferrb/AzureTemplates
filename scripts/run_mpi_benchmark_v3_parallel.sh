@@ -104,13 +104,13 @@ scp scripts/run_bench.sh ${GROUP_NAME}/hostfile ${SSH_ADDR}:
 # rm ${GROUP_NAME}/hostfile
 ssh ${SSH_ADDR} << EOF
     set -x
-    # rm ~/.ssh/known_hosts
-    for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        ssh-keygen -R "10.0.0.\${host}"
-        ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
-        # ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
-        # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
-    done
+    rm ~/.ssh/known_hosts
+    # for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+    #     ssh-keygen -R "10.0.0.\${host}"
+    #     # ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
+    #     # ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
+    #     # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
+    # done
     chmod +x run_bench.sh
     ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH}"
 EOF

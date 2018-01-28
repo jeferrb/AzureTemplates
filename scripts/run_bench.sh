@@ -19,7 +19,7 @@ run_bench() {
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"  --oversubscribe --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --oversubscribe --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
   done
@@ -27,7 +27,7 @@ run_bench() {
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"  --oversubscribe --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --oversubscribe --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
     echo | tee -a "${name}_singularity.log"
   done
@@ -44,7 +44,8 @@ if [[ ${SMALL} ]]; then
     run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
   done
 else
-  for class in A B C D; do
+  # for class in A B C D; do
+  for class in A A A A; do # B C D; do
     run_bench lu "${class}" 32 ${NUMBER_REPETITIONS} ${BIN_PATH}
     run_bench sp "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
     run_bench sp "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
