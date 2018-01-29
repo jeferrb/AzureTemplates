@@ -4,6 +4,7 @@ set -x
 SMALL=
 NUMBER_REPETITIONS=${1}
 BIN_PATH=${2}
+TOTAL_CORES=${3}
 
 # run_bench(bench, class, nprocs, repetitions, path)
 run_bench() {
@@ -14,20 +15,23 @@ run_bench() {
   local path="${5}"
   local name="${bench}.${class}.${nprocs}"
 
-  nohup sar -o "${name}.sa" 5 > /dev/null 2>&1 &
+  nohup sar -o "${name}_native.sa" 5 > /dev/null 2>&1 &
   
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --oversubscribe --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
   done
   
+  killall sar
+  nohup sar -o "${name}_singularity.sa" 5 > /dev/null 2>&1 &
+
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --oversubscribe --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
     echo | tee -a "${name}_singularity.log"
   done
