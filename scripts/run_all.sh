@@ -89,7 +89,7 @@ NUMBER_INSTANCES=8
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
 
-wait
+# wait
 
 AZURE_MACHINES=1
 NUMBER_INSTANCES=16
