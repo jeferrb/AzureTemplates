@@ -120,7 +120,7 @@ ssh ${SSH_ADDR} << EOF
         # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
     done
     chmod +x run_bench.sh
-    ./run_bench.sh "${NUMBER_REPETITIONS} ${BIN_PATH} ${NUMBER_JOBS}"
+    ./run_bench.sh ${NUMBER_REPETITIONS} ${BIN_PATH} ${NUMBER_JOBS}
 EOF
 mkdir -p ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
