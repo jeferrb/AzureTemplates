@@ -39,21 +39,27 @@ run_bench() {
   killall sar
 }
 
-if [[ ${SMALL} ]]; then
-  for class in S; do
-    run_bench lu "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench sp "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench sp "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
-  done
-else
-  for class in A B C D; do
-  # for class in A ; do # B C D; do
-    run_bench lu "${class}" 32 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench sp "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench sp "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench bt "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
-    run_bench bt "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
-  done
-fi
+for class in A ; do # B C D; do
+  run_bench lu "${class}" ${TOTAL_CORES} ${NUMBER_REPETITIONS} ${BIN_PATH}
+  run_bench sp "${class}" ${TOTAL_CORES} ${NUMBER_REPETITIONS} ${BIN_PATH}
+  run_bench bt "${class}" ${TOTAL_CORES} ${NUMBER_REPETITIONS} ${BIN_PATH}
+done
+
+
+# if [[ ${SMALL} ]]; then
+#   for class in S; do
+#     run_bench lu "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench sp "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench sp "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench bt "${class}" 16 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#   done
+#   for class in A B C D; do
+#   # for class in A ; do # B C D; do
+#     run_bench lu "${class}" 32 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench sp "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench sp "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench bt "${class}" 25 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#     run_bench bt "${class}" 36 ${NUMBER_REPETITIONS} ${BIN_PATH}
+#   done
+# fi
