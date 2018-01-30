@@ -13,10 +13,11 @@ VM_SIZE=${VM_SIZES[${3}]}
 NUMBER_RROCESSORS=${VM_CORES[${3}]}
 NUMBER_JOBS=`echo "${NUMBER_INSTANCES} * ${NUMBER_RROCESSORS}" | bc`
 RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_result"
-LOG_FILE=logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log
+LOG_DIR=${VM_SIZE}_${NUMBER_INSTANCES}_${NUMBER_REPETITIONS}_${GROUP_NAME}
+LOG_FILE=${LOG_DIR}/logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log
 
-MINWAIT=90
-MAXWAIT=60
+MINWAIT=5
+MAXWAIT=200
 MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
 
 function pause(){
@@ -30,8 +31,8 @@ createMachines(){
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
     --template-file azuredeploy_multiple_from_new_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
-    adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}
-    local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+    adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}.log
+    local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1}.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
     sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
     # Add all credential do cop the host public key later
@@ -39,13 +40,13 @@ createMachines(){
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
     echo "" > known_hosts
     scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
-    cat ${LOG_FILE}_${1} >> ${LOG_FILE}
-    rm ${LOG_FILE}_${1}
-    # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> ${GROUP_NAME}/hostfile
+    cat ${LOG_FILE}_${1}.log >> ${LOG_FILE}
+    # rm ${LOG_FILE}_${1}.log
+    # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 }
 
 
-mkdir ${GROUP_NAME}
+mkdir -p ${LOG_DIR}
 
 date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
@@ -62,7 +63,7 @@ fi
 #     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 # fi
 
-rm ${GROUP_NAME}/hostfile
+# rm ${LOG_DIR}/hostfile
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     createMachines $i $1 $2 &
     sleep $(((RANDOM % 10)+3))
@@ -95,18 +96,18 @@ fi
 grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev | xargs -L1 ssh-keygen -R
 grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev | xargs -L1 ssh-keyscan -H >> ~/.ssh/known_hosts
 # copy coordinator (master) credential to all slaves
-scp ${SSH_ADDR}:~/.ssh/id_rsa.pub ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
-grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
-rm ${GROUP_NAME}/id_rsa_coodinator_${GROUP_NAME}.pub
+scp ${SSH_ADDR}:~/.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
+grep "ssh " ${LOG_FILE} | xargs -L1 echo | cut -c 12- | xargs -L1 ssh-copy-id -f -i ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
+rm ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
 # pause "Press [Enter] key to execute"
 
-# rm ${GROUP_NAME}/hostfile
+# rm ${LOG_DIR}/hostfile
 for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
-    echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${GROUP_NAME}/hostfile
+    echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
-scp scripts/run_bench.sh ${GROUP_NAME}/hostfile ${SSH_ADDR}:
-# rm ${GROUP_NAME}/hostfile
+scp scripts/run_bench.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
+# rm ${LOG_DIR}/hostfile
 ssh ${SSH_ADDR} << EOF
     set -x
     rm ~/.ssh/known_hosts

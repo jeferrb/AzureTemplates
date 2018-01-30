@@ -55,6 +55,8 @@ NUMBER_INSTANCES=16
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
 
+wait
+
 AZURE_MACHINES=1
 NUMBER_INSTANCES=32
 ./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
@@ -86,6 +88,8 @@ NUMBER_INSTANCES=8
 ./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+
+wait
 
 AZURE_MACHINES=1
 NUMBER_INSTANCES=16
@@ -159,5 +163,7 @@ NUMBER_INSTANCES=1
 ./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+
+wait
 
 fi
