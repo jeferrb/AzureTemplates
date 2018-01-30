@@ -404,7 +404,7 @@
         },
         "storageProfile": {
             "imageReference": {
-                "id": "/subscriptions/52287571-8edb-4815-aeb0-66a3b24e4866/resourceGroups/resource_image/providers/Microsoft.Compute/images/Base-image-testmpi-20180130101923"
+                "id": "/subscriptions/52287571-8edb-4815-aeb0-66a3b24e4866/resourceGroups/new_resource_image/providers/Microsoft.Compute/images/base-image-new-image-20180130115133"
             },
             "osDisk": {
                 "createOption": "fromImage",
