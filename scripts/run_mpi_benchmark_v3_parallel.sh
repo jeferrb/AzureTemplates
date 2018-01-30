@@ -29,7 +29,7 @@ createMachines(){
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
-    --template-file azuredeploy_multiple_from_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
+    --template-file azuredeploy_multiple_from_new_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}
     local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
