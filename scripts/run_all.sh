@@ -22,8 +22,8 @@ done
 
 if [[ 0 ]]; then
 
-MINWAIT=100
-MAXWAIT=300
+MINWAIT=1
+MAXWAIT=10
 # MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
 
 

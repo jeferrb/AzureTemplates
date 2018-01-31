@@ -20,7 +20,7 @@ MINWAIT=120
 MAXWAIT=200
 MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
 
-lockdir=/tmp/myCreateAzureMachine.lock
+lockfile=/tmp/myCreateAzureMachine.lock
 
 function pause(){
     read -p "$*"
@@ -29,9 +29,10 @@ function pause(){
 
 createMachines(){
     echo "Creating the machine number $1"
-  while [[ ! mkdir "$lockdir" ]]; do
+  while [[ -e  $lockfile ]]; do
     sleep $((RANDOM % 20))
   done
+  touch "$lockfile"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
@@ -39,7 +40,7 @@ createMachines(){
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}.log
     local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1}.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
-  rm -r "$lockdir"
+  rm -r "$lockfile"
     sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
     # Add all credential do cop the host public key later
     ssh-keygen -R ${HOST_ADDR}
