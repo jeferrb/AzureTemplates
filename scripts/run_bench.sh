@@ -21,7 +21,7 @@ run_bench() {
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
-    mpirun -np "${nprocessors}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
   done
@@ -32,7 +32,7 @@ run_bench() {
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
-    mpirun -np "${nprocessors}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no"  --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
     echo | tee -a "${name}_singularity.log"
   done
