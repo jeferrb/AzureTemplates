@@ -17,7 +17,7 @@ LOG_DIR=${VM_SIZE}_${NUMBER_INSTANCES}_${NUMBER_REPETITIONS}_${GROUP_NAME}
 LOG_FILE=${LOG_DIR}/logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log
 
 MINWAIT=120
-MAXWAIT=200
+MAXWAIT=300
 MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
 
 lockfile=/tmp/myCreateAzureMachine.lock
@@ -29,10 +29,6 @@ function pause(){
 
 createMachines(){
     echo "Creating the machine number $1"
-  while [[ -e  $lockfile ]]; do
-    sleep $((RANDOM % 200))
-  done
-  touch "$lockfile"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
@@ -40,8 +36,7 @@ createMachines(){
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" > ${LOG_FILE}_${1}.log
     local SSH_ADDR=`grep "ssh " ${LOG_FILE}_${1}.log | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
     local HOST_ADDR=`echo $SSH_ADDR | cut -d '@' -f 2`
-  rm -r "$lockfile"
-    sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+    sleep 20
     # Add all credential do cop the host public key later
     ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
@@ -75,12 +70,18 @@ fi
 #     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 # fi
 
+
+while [[ -e  $lockfile ]]; do
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+done
+touch "$lockfile"
 # rm ${LOG_DIR}/hostfile
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
-    createMachines $i $1 $2 &
-    sleep $(((RANDOM % 10)+3))
+    createMachines $i $1 $2 # &
+    # sleep $(((RANDOM % 10)+3))
 done
-wait
+# wait
+rm -r "$lockfile"
 
 # da uns 3 minutinho pras maquina ser criada
 # sleep 180
