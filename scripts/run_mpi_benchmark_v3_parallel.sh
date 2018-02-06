@@ -46,7 +46,11 @@ createMachines(){
     ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
     echo "" > known_hosts
-    scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
+    # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
+ssh ${SSH_ADDR} << EOF
+    rm -f *.log
+    rm  ~/.ssh/known_hosts
+EOF
     cat ${LOG_FILE}_${1}.log >> ${LOG_FILE}
     # rm ${LOG_FILE}_${1}.log
     # echo "${HOST_ADDR} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile

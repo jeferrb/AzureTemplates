@@ -3,7 +3,7 @@
     sudo apt-get update
     sudo apt-get upgrade -y
     sudo apt-get dist-upgrade -y
-    sudo apt-get install build-essential ubuntu-desktop gcc make -y
+    sudo apt-get install build-essential ubuntu-desktop gcc make -y tmux zsh clinfo
     # sudo apt-get install build-essential gcc make -y
 
 # Disable the Nouveau kernel driver, which is incompatible with the NVIDIA driver. (Only use the NVIDIA driver on NV VMs.) To do this, create a file in /etc/modprobe.d named nouveau.conf
@@ -17,14 +17,14 @@
     sudo systemctl stop lightdm.service
     wget -O NVIDIA-Linux-x86_64-384.73-grid.run https://go.microsoft.com/fwlink/?linkid=849941
     chmod +x NVIDIA-Linux-x86_64-384.73-grid.run
-    sudo ./NVIDIA-Linux-x86_64-384.73-grid.run
+    sudo ./NVIDIA-Linux-x86_64-384.73-grid.run --ui=none --no-questions --accept-license --disable-nouveau
 
 # When you're asked whether you want to run the nvidia-xconfig utility to update your X configuration file, select Yes.
 
     sudo cp /etc/nvidia/gridd.conf.template /etc/nvidia/gridd.conf
 
 #Add the following to /etc/nvidia/gridd.conf:
-    sudo echo "IgnoreSP=TRUE" >> /etc/nvidia/gridd.conf
+    sudo bash -c 'echo "IgnoreSP=TRUE" >> /etc/nvidia/gridd.conf'
 
 #Cuda:
 
@@ -36,10 +36,10 @@
     sudo apt-get update
     sudo apt-get install -y cuda-drivers cuda
 
-    export PATH=/usr/local/cuda-9.1/bin${PATH:+:${PATH}}
-    export LD_LIBRARY_PATH=/usr/local/cuda-9.1/lib64\${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+    bash -c 'echo "export PATH=/usr/local/cuda-9.1/bin${PATH:+:${PATH}}" >> .bashrc'
+    bash -c 'echo "export LD_LIBRARY_PATH=/usr/local/cuda-9.1/lib64\${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> .bashrc'
 
-    sudo apt install ocl-icd-opencl-dev
+    sudo apt install -y ocl-icd-opencl-dev
 
 #Reboot the VM and proceed to verify the installation.
 

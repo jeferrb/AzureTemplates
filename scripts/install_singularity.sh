@@ -35,7 +35,7 @@ tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION
 ./configure --prefix=/usr/local
 make -j
-sudo make install
+sudo make -j install
 cd
 sudo mkdir /home/username/mymountpoint
 echo "${1}" > pass

@@ -22,6 +22,8 @@ done
 
 if [[ 0 ]]; then
 
+rm /tmp/myCreateAzureMachine.lock
+
 MINWAIT=1
 MAXWAIT=10
 # MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
