@@ -30,7 +30,7 @@ function pause(){
 createMachines(){
     echo "Creating the machine number $1"
   while [[ -e  $lockfile ]]; do
-    sleep $((RANDOM % 20))
+    sleep $((RANDOM % 200))
   done
   touch "$lockfile"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
