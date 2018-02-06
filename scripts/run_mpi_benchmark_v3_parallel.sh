@@ -45,11 +45,12 @@ createMachines(){
     # Add all credential do cop the host public key later
     ssh-keygen -R ${HOST_ADDR}
     ssh-keyscan -H ${HOST_ADDR} >> ~/.ssh/known_hosts
+
     echo "" > known_hosts
-    # scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
+    scp known_hosts ${HOST_ADDR}:.ssh/known_hosts
 ssh ${SSH_ADDR} << EOF
-    rm -f *.log
-    rm  ~/.ssh/known_hosts
+rm -f *.log
+rm  ~/.ssh/known_hosts
 EOF
     cat ${LOG_FILE}_${1}.log >> ${LOG_FILE}
     # rm ${LOG_FILE}_${1}.log
