@@ -96,15 +96,15 @@ if [[ -z "${SSH_ADDR}" ]]; then
 fi
 
 # Create an id RSA for the coordenator # Do it just if the next scp fails
-# ssh ${SSH_ADDR} << EOF
-#     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-#     FILE=~/.ssh/id_rsa.pub
-#     if [ ! -e "\$FILE" ]; then
-#         # if there is not an rsa key, create it
-#         echo "File \$FILE does not exist"
-#         ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-#     fi
-# EOF
+ssh ${SSH_ADDR} << EOF
+    ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+    FILE=~/.ssh/id_rsa.pub
+    if [ ! -e "\$FILE" ]; then
+        # if there is not an rsa key, create it
+        echo "File \$FILE does not exist"
+        ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+    fi
+EOF
 
 grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev | xargs -L1 ssh-keygen -R
 grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev | xargs -L1 ssh-keyscan -H >> ~/.ssh/known_hosts
