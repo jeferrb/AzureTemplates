@@ -3,6 +3,7 @@
 # nohup bash -c "(time ./run_all.sh 0) 2>&1 | tee -a mountpoint/results/nohup_output.log" &
 
 declare -a AZURE_MACHINES=( 1 2 3 4 9 55 )
+# declare -a AZURE_MACHINES=( 2 3 4 5 10 56 )
 declare -a NUMBER_INSTANCES=( 1 2 4 8 16 32 )
 
 j=1
@@ -151,11 +152,15 @@ for i in `seq 0 $NUMBER_INSTANCES` ; do sleep $(((RANDOM % $MAXWAIT)+$MINWAIT));
 wait
 # wait
 
+stty -tostop
+
 AZURE_MACHINES=1
 NUMBER_INSTANCES=16
 ./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 for i in `seq 0 $NUMBER_INSTANCES` ; do sleep $(((RANDOM % $MAXWAIT)+$MINWAIT)); done
+
+stty -tostop
 
 AZURE_MACHINES=2
 NUMBER_INSTANCES=16
@@ -163,6 +168,7 @@ NUMBER_INSTANCES=16
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 for i in `seq 0 $NUMBER_INSTANCES` ; do sleep $(((RANDOM % $MAXWAIT)+$MINWAIT)); done
 
+stty -tostop
 
 AZURE_MACHINES=1
 NUMBER_INSTANCES=32

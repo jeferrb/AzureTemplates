@@ -95,7 +95,7 @@ if [[ -z "${SSH_ADDR}" ]]; then
     az group delete --resource-group ${GROUP_NAME} --yes --no-wait
 fi
 
-# Create an id RSA for the coordenator # Do it just if the next scp fails
+# Create an id RSA for the coordenator
 ssh ${SSH_ADDR} << EOF
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
     FILE=~/.ssh/id_rsa.pub
@@ -127,11 +127,13 @@ ssh ${SSH_ADDR} << EOF
     # ssh-keygen -f "/home/username/.ssh/known_hosts" -R
     echo "" > known_hosts
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
-        scp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
-        # ssh-keygen -R "10.0.0.\${host}"
-        # ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hostsscp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
-        # ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
-        # ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
+        ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
+        ssh "10.0.0.\${host}" ls
+        scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
+        
+    done
+    for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+        scp .ssh/known_hosts "10.0.0.\${host}":.ssh
     done
     chmod +x run_bench.sh
     ./run_bench.sh ${NUMBER_REPETITIONS} ${BIN_PATH} ${NUMBER_JOBS}
@@ -148,3 +150,9 @@ MOUNTPOINT=~/mountpoint/
 if [ -d "$MOUNTPOINT" ]; then
     cp -r results "$MOUNTPOINT/results_$(whoami)$(date +%s)"
 fi
+
+# scp -o StrictHostKeyChecking=no known_hosts 10.0.0.\${host}:.ssh/known_hosts
+# ssh-keygen -R "10.0.0.\${host}"
+# ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hostsscp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
+# ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
+# ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
