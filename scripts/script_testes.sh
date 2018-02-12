@@ -4,7 +4,10 @@
 # export LD_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:$LD_LIBRARY_PATH
 # export ACC_DEVICE_TYPE=host
 
-IMAGE_PATH="/home/username/ruycastilho-GPUtest-master.simg"
+# singularity pull docker://nvidia/opencl
+
+IMAGE_PATH="/home/username/opencl.img"
+# IMAGE_PATH="/home/username/ruycastilho-GPUtest-master.simg"
 ROOT_DIR="/home/username/OpenCL-seismic-processing-tiago/"
 # DATASET="/home/username/Data/fold200.sgy"
 DATASET="/home/username/Data/701-jequit-Data-Mute-Attenuation.su"

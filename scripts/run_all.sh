@@ -156,7 +156,7 @@ stty -tostop
 
 AZURE_MACHINES=1
 NUMBER_INSTANCES=16
-./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
+./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 for i in `seq 0 $NUMBER_INSTANCES` ; do sleep $(((RANDOM % $MAXWAIT)+$MINWAIT)); done
 
@@ -164,7 +164,7 @@ stty -tostop
 
 AZURE_MACHINES=2
 NUMBER_INSTANCES=16
-./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
+./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 for i in `seq 0 $NUMBER_INSTANCES` ; do sleep $(((RANDOM % $MAXWAIT)+$MINWAIT)); done
 
@@ -172,7 +172,7 @@ stty -tostop
 
 AZURE_MACHINES=1
 NUMBER_INSTANCES=32
-./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log &
+./scripts/run_mpi_benchmark_v3_parallel.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a run_mpi_benchmark_v3_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log
 # read -p "Press enter to continue $AZURE_MACHINES , $NUMBER_INSTANCES"
 for i in `seq 0 $NUMBER_INSTANCES` ; do sleep $(((RANDOM % $MAXWAIT)+$MINWAIT)); done
 
