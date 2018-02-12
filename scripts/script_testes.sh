@@ -42,6 +42,8 @@ PARAM_TAU="0.002"
 PARAM_D="1"
 PARAM_V="4"
 
+mkdir ${ROOT_DIR}/Result
+
 clinfo > ${ROOT_DIR}/Result/clinfo
 
 for benchmark in `seq 1 ${#NAMES[@]}`; do

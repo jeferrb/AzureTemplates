@@ -1,0 +1,30 @@
+[Matrix Multiply Using CUDA] - Starting...
+GPU Device 0: "TITAN X (Pascal)" with compute capability 6.1
+
+MatrixA(12800,12800), MatrixB(640,12800)
+Computing result using CUDA Kernel...
+done
+Performance= 1715.79 GFlop/s, Time= 122.227 msec, Size= 209715200000 Ops, WorkgroupSize= 1024 threads/block
+Checking computed result for correctness: Result = PASS
+
+NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
+[Matrix Multiply Using CUDA] - Starting...
+GPU Device 0: "TITAN X (Pascal)" with compute capability 6.1
+
+MatrixA(12800,12800), MatrixB(640,12800)
+Computing result using CUDA Kernel...
+done
+Performance= 1674.13 GFlop/s, Time= 125.268 msec, Size= 209715200000 Ops, WorkgroupSize= 1024 threads/block
+Checking computed result for correctness: Result = PASS
+
+NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
+[Matrix Multiply Using CUDA] - Starting...
+GPU Device 0: "TITAN X (Pascal)" with compute capability 6.1
+
+MatrixA(12800,12800), MatrixB(640,12800)
+Computing result using CUDA Kernel...
+done
+Performance= 1656.04 GFlop/s, Time= 126.637 msec, Size= 209715200000 Ops, WorkgroupSize= 1024 threads/block
+Checking computed result for correctness: Result = PASS
+
+NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.

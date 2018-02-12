@@ -3,6 +3,7 @@
 # the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the number of instances
 
 set -x
+# cd $HOME/AzureTemplates
 GROUP_NAME=mpi${RANDOM}
 NUMBER_INSTANCES=${4}
 BIN_PATH="/home/username/mymountpoint/NPB3.3-MPI/bin/"
@@ -73,6 +74,7 @@ fi
 
 while [[ -e  $lockfile ]]; do
 sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+echo "Waiting to finish the machine creation"
 done
 touch "$lockfile"
 # rm ${LOG_DIR}/hostfile
@@ -125,7 +127,7 @@ ssh ${SSH_ADDR} << EOF
     set -x
     rm ~/.ssh/known_hosts
     # ssh-keygen -f "/home/username/.ssh/known_hosts" -R
-    echo "" > known_hosts
+    # echo "" > known_hosts
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
         ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
         ssh "10.0.0.\${host}" ls
