@@ -5,3 +5,4 @@
 *.out
 hostfile
 results/*
+scripts/matrix_mul/results*
