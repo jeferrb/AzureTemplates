@@ -1,14 +1,15 @@
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-sudo apt-get -y upgrade
-sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc
+# sudo apt-get -y upgrade
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc automake m4
 
 
 
-VERSION=2.4
+VERSION=2.4.2
 wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION
+echo "libgomp.so" >> etc/nvliblist.conf
 ./configure --prefix=/usr/local
 make -j
 sudo make install

@@ -6,13 +6,13 @@
 
 # singularity pull docker://nvidia/opencl
 
-IMAGE_PATH="/home/username/opencl.img"
-# IMAGE_PATH="/home/username/ruycastilho-GPUtest-master.simg"
-ROOT_DIR="/home/username/OpenCL-seismic-processing-tiago/"
-# DATASET="/home/username/Data/fold200.sgy"
-DATASET="/home/username/Data/701-jequit-Data-Mute-Attenuation.su"
-# DATASET="/home/username/Data/simple-syntetic-micro_sorted.su"
-# DATASET="/home/username/Data/simple-synthetic.su"
+IMAGE_PATH="$HOME/opencl.img"
+# IMAGE_PATH="$HOME/ruycastilho-GPUtest-master.simg"
+ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago/"
+# DATASET="$HOME/Data/fold200.sgy"
+DATASET="$HOME/Data/701-jequit-Data-Mute-Attenuation.su"
+# DATASET="$HOME/Data/simple-syntetic-micro_sorted.su"
+# DATASET="$HOME/Data/simple-synthetic.su"
 DATA=${DATASET##*/}
 DATA=${DATA%.su}
 
