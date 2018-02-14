@@ -28,7 +28,7 @@ createMachines(){
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
     # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
-    --template-file azuredeploy.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
+    --template-file azuredeploy_non_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
 }
 
@@ -144,8 +144,3 @@ set +x
 #     cp -r results "$MOUNTPOINT/results_$(whoami)$(date +%s)"
 # fi
 
-# scp -o StrictHostKeyChecking=no known_hosts 10.0.0.\${host}:.ssh/known_hosts
-# ssh-keygen -R "10.0.0.\${host}"
-# ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hostsscp -o StrictHostKeyChecking=no known_hosts 10.0.0.${i}:.ssh/known_hosts
-# ssh-keygen -R "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com"
-# ssh-keyscan -H "my${GROUP_NAME}dnsprefix\${host}.southcentralus.cloudapp.azure.com" >> ~/.ssh/known_hosts
