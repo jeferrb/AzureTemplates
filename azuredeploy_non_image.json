@@ -434,6 +434,30 @@
           }
         }
       }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'), '/InstallSingularity')]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+      ],
+      "tags": {
+          "displayName": "InstallSingularity"
+      },
+      "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[concat(parameters('_artifactsLocation'), '/', variables('scriptFolder'), '/', variables('scriptFileName'))]"
+          ],
+           "commandToExecute": "[concat('./', variables('scriptFileName'), ' ', parameters('scriptParameterPassMount'), '&>> /home/username/install_script.log')]"
+        }
+      }
     }
   ],
   "outputs": {
