@@ -1,10 +1,10 @@
 #!/bin/bash
-
+# tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username &
 #Install MPI and dependencies
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-# sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc
-sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev bc libnuma-dev libibverbs-dev gfortran &
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc &
+# sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev bc libnuma-dev libibverbs-dev gfortran &
 
 # For mpich do: sudo apt-get install mpich libmpich-dev libhdf5-mpich-dev
 
@@ -46,8 +46,6 @@ sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/usernam
 rm pass
 sudo mount -a
 
-cd /home/username/
-tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username
 wait
 cp /home/username/mymountpoint/ubuntu.img /home/username/ &
 
@@ -64,13 +62,15 @@ sudo make install
 
 # cd /home/username/
 # tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username
-cd /home/username/openmpi-3.0.0
-sudo make install
-cat <<EOT >> /home/username/.bashrc
-export PATH="$PATH:/home/username/.openmpi/bin"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/username/.openmpi/lib/"
-EOT
-source ~/.bashrc
+# cd /home/username/openmpi-3.0.0
+# sudo make install &>> azure_install.log
+# cat <<EOT >> /home/username/.bashrc
+# export PATH="$PATH:/home/username/.openmpi/bin"
+# export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/username/.openmpi/lib/"
+# EOT
+# source ~/.bashrc
+
+echo "done" > donefile
 
 # cp /home/username/mymountpoint/ubuntu.img /home/username/
 
