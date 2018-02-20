@@ -55,6 +55,7 @@ echo "******************************************"  >> ${LOG_FILE}
 for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
     echo " Copy id from $i"
     ssh-keygen -R $i
+    ssh-keygen -R `dig +short $i`
     ssh-keyscan -H $i >> ~/.ssh/known_hosts
 done
 
