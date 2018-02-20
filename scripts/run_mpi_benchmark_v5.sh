@@ -90,6 +90,11 @@ done
 
 scp scripts/run_bench.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
 # rm ${LOG_DIR}/hostfile
+
+
+set +x
+
+
 ssh ${SSH_ADDR} << EOF
     set -x
     # Add all nodes to known hosts and copy the private key to all machines
