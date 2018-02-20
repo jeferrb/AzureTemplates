@@ -57,10 +57,10 @@ sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/usernam
 rm pass
 sudo mount -a
 
-cp $HOME/mymountpoint/ubuntu.img .
+cp /home/username/mymountpoint/ubuntu.img /home/username/
 
-tar -zxvf $HOME/mymountpoint/openmpi-3.0.0_compiled.tar.gz 
-cd $HOME/openmpi-3.0.0
+tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz 
+cd /home/username/openmpi-3.0.0
 sudo make install
 cat <<EOT >> ~/.bashrc
 export PATH="$PATH:/home/$USER/.openmpi/bin"
