@@ -59,10 +59,11 @@ sudo mount -a
 
 cp /home/username/mymountpoint/ubuntu.img /home/username/
 
-tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz 
+cd /home/username/
+tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username
 cd /home/username/openmpi-3.0.0
 sudo make install
-cat <<EOT >> ~/.bashrc
+cat <<EOT >> /home/username/.bashrc
 export PATH="$PATH:/home/$USER/.openmpi/bin"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
 EOT
