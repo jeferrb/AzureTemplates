@@ -21,8 +21,6 @@ MINWAIT=120
 MAXWAIT=300
 MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
 
-lockfile=/tmp/myCreateAzureMachine.lock
-
 createMachines(){
     echo "Creating the machine number $1"
     # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
@@ -42,18 +40,11 @@ if [ ! $? -eq 0 ]; then
     exit
 fi
 
-
-while [[ -e  $lockfile ]]; do
-sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
-echo "Waiting to finish the machine creation"
-done
-touch "$lockfile"
 # rm ${LOG_DIR}/hostfile
 for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     createMachines $i $1 $2 &
     sleep 10
 done
-rm -r "$lockfile"
 wait
 #wait while to create the least machine
 sleep 90
@@ -89,9 +80,10 @@ EOF
 scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
 for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
     echo "Put ssh key on $i"
-    ssh-copy-id -f -i ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub "username@${i}"
+    ssh-copy-id -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub "username@${i}"
 done
 
+rm ${LOG_DIR}/hostfile
 for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
@@ -110,7 +102,10 @@ ssh ${SSH_ADDR} << EOF
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
         scp .ssh/known_hosts "10.0.0.\${host}":.ssh
     done
-    #execute the benchmark
+EOF
+
+#execute the benchmark
+ssh ${SSH_ADDR} << EOF
     bash ./run_bench.sh ${NUMBER_REPETITIONS} ${BIN_PATH} ${NUMBER_JOBS}
 EOF
 mkdir -p ${RESULTS_DIRECTORY}

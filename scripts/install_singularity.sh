@@ -3,14 +3,17 @@
 #Install MPI and dependencies
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc
+# sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev bc
 # For mpich do: sudo apt-get install mpich libmpich-dev libhdf5-mpich-dev
+
+# git clone https://github.com/jeferrb/AzureTemplates.git
 
 # wget -q https://www.open-mpi.org/software/ompi/v3.0/downloads/openmpi-3.0.0.tar.gz
 # tar -zxf openmpi-3.0.0.tar.gz
 # cd openmpi-3.0.0
-# ./configure --with-device=ch3:ssm --prefix="/home/$USER/.openmpi"
-# make -j2 && sudo make install
+# ./configure --with-device=ch3:ssm --prefix="/home/$USER/.openmpi" # --enable-mpirun-prefix-by-default # 
+# make -j && sudo make install
 # cat <<EOT >> ~/.bashrc
 # export PATH="$PATH:/home/$USER/.openmpi/bin"
 # export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
@@ -54,6 +57,15 @@ rm pass
 sudo mount -a
 
 cp mymountpoint/ubuntu.img .
+
+tar -zxvf mymountpoint/openmpi-3.0.0_compiled.tar.gz 
+cd openmpi-3.0.0
+sudo make install
+cat <<EOT >> ~/.bashrc
+export PATH="$PATH:/home/$USER/.openmpi/bin"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
+EOT
+source ~/.bashrc
 
 
 # cp /home/username/mymountpoint/ubuntu.img /home/username/

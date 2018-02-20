@@ -107,6 +107,7 @@ ssh ${SSH_ADDR} << EOF
     # Copy known host that contains all machines to all machines
     for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
         scp .ssh/known_hosts "10.0.0.\${host}":.ssh
+        scp run_bench.sh "10.0.0.\${host}":
     done
     #execute the benchmark
     bash ./run_bench.sh ${NUMBER_REPETITIONS} ${BIN_PATH} ${NUMBER_JOBS}

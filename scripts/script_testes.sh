@@ -9,8 +9,8 @@
 IMAGE_PATH="$HOME/opencl.img"
 # IMAGE_PATH="$HOME/ruycastilho-GPUtest-master.simg"
 ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago/"
-# DATASET="$HOME/Data/fold200.sgy"
-DATASET="$HOME/Data/701-jequit-Data-Mute-Attenuation.su"
+DATASET="$HOME/seismic-data/fold1000.su"
+# DATASET="$HOME/Data/701-jequit-Data-Mute-Attenuation.su"
 # DATASET="$HOME/Data/simple-syntetic-micro_sorted.su"
 # DATASET="$HOME/Data/simple-synthetic.su"
 DATA=${DATASET##*/}
@@ -334,3 +334,6 @@ done
 ./execute_host.sh
 singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
 # rm execute_*.sh
+
+cd ${ROOT_DIR}
+ls Result
