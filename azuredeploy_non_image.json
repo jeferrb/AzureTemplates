@@ -455,7 +455,7 @@
           "fileUris": [
             "[concat(parameters('_artifactsLocation'), '/', variables('scriptFolder'), '/', variables('scriptFileName'))]"
           ],
-           "commandToExecute": "[concat('./', variables('scriptFileName'), ' ', parameters('scriptParameterPassMount'), '&>> /home/username/install_script.log')]"
+           "commandToExecute": "[concat('./', variables('scriptFileName'), ' ', parameters('scriptParameterPassMount'))]"
         }
       }
     }
