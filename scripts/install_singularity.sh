@@ -1,9 +1,23 @@
 #!/bin/bash
 # tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username &
+
+LOGFILE="/home/username/instalation.log"
+
+#check network conction
+ATTEMPTS=0
+while [ $(nc -zw1 google.com 443) ] && [ "$ATTEMPTS" -lt 5 ]; do
+  echo "we have NO connectivity" &>> ${LOGFILE}
+  sleep 15
+  ATTEMPTS=$((ATTEMPTS+1))
+done
+
+echo cp "/home/username/mymountpoint/ubuntu.img /home/username/" &>> ${LOGFILE}
+cp /home/username/mymountpoint/ubuntu.img /home/username/  &>> ${LOGFILE} &
+
 #Install MPI and dependencies
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
-sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc &
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc &>> ${LOGFILE} &
 # sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev bc libnuma-dev libibverbs-dev gfortran &
 
 # For mpich do: sudo apt-get install mpich libmpich-dev libhdf5-mpich-dev
@@ -33,11 +47,13 @@ sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibne
 # EOT
 # source ~/.bashrc
 
-#Create a swapfile
-sudo fallocate -l 4G /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-sudo bash -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
+if [[ $SWAP ]]; then
+	#Create a swapfile
+	sudo fallocate -l 4G /swapfile
+	sudo mkswap /swapfile
+	sudo swapon /swapfile
+	sudo bash -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
+fi
 
 # creade and setup the shared folder 
 sudo mkdir /home/username/mymountpoint
@@ -47,16 +63,16 @@ rm pass
 sudo mount -a
 
 wait
-cp /home/username/mymountpoint/ubuntu.img /home/username/ &
 
+echo cp "*************** Install Singularity" &>> ${LOGFILE}
 # Install Singularity
 VERSION=2.4.2
 wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
 tar xvf singularity-$VERSION.tar.gz
 cd singularity-$VERSION
 echo "libgomp.so" >> etc/nvliblist.conf
-./configure --prefix=/usr/local
-make -j
+./configure --prefix=/usr/local &>> ${LOGFILE}
+make -j &>> ${LOGFILE}
 sudo make install
 
 
