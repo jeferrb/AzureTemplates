@@ -4,7 +4,7 @@
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
 # sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc
-sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev bc libnuma-dev libibverbs-dev gfortran
+sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev bc libnuma-dev libibverbs-dev gfortran &
 
 # For mpich do: sudo apt-get install mpich libmpich-dev libhdf5-mpich-dev
 
@@ -39,6 +39,18 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 sudo bash -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
 
+# creade and setup the shared folder 
+sudo mkdir /home/username/mymountpoint
+echo "${1}" > pass
+sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/username/mymountpoint cifs nofail,vers=3.0,username=test1diag281,password=`cat pass`,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
+rm pass
+sudo mount -a
+
+cd /home/username/
+tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username
+wait
+cp /home/username/mymountpoint/ubuntu.img /home/username/ &
+
 # Install Singularity
 VERSION=2.4.2
 wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
@@ -49,28 +61,16 @@ echo "libgomp.so" >> etc/nvliblist.conf
 make -j
 sudo make install
 
-# creade and setup the shared folder 
-cd
-sudo mkdir /home/username/mymountpoint
-echo "${1}" > pass
-sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/username/mymountpoint cifs nofail,vers=3.0,username=test1diag281,password=`cat pass`,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
-rm pass
-sudo mount -a
 
-cp /home/username/mymountpoint/ubuntu.img /home/username/
-
-cd /home/username/
-tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username
+# cd /home/username/
+# tar -zxvf /home/username/mymountpoint/openmpi-3.0.0_compiled.tar.gz  -C /home/username
 cd /home/username/openmpi-3.0.0
 sudo make install
 cat <<EOT >> /home/username/.bashrc
-export PATH="$PATH:/home/$USER/.openmpi/bin"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
+export PATH="$PATH:/home/username/.openmpi/bin"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/username/.openmpi/lib/"
 EOT
 source ~/.bashrc
-
-cd
-
 
 # cp /home/username/mymountpoint/ubuntu.img /home/username/
 
