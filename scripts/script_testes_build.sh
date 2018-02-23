@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export ACC_DEVICE_TYPE=host
-ROOT_DIR="/home/username/OpenCL-seismic-processing-tiago"
+ROOT_DIR="/home/$USER/OpenCL-seismic-processing-tiago"
 
 
 cd $ROOT_DIR/

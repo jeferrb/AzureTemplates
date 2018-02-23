@@ -12,7 +12,8 @@ for i in *; do
 		find $i -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'" \; > result_${i}.txt
 	fi
 done
-
+find . -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'" \; > result_all.txt
+find . -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'" \; > result_kernel.txt
 
 
 # - - - - - - - - MPI - - - - - - - - - -
@@ -22,4 +23,13 @@ for i in *; do
 	if [[  -d "$i" ]] && [[ ! -e result_${i}.txt ]]; then
 		find $i -type f -print  -name "*\.A\.*\.log" -exec sh -c "cat {} | grep 'seconds\|Running'" \; > result_${i}.txt
 	fi
+done
+
+
+# - - - - - - - - MatrixMul - - - - - - - - - -
+
+for i in *; do
+        if [[  -d "$i" ]] && [[ ! -e result_${i}.txt ]]; then
+                find $i -type f -print  -name "*.output" -exec sh -c "cat {} | grep 'Time\|Done:'" \; > result_${i}.txt
+        fi
 done

@@ -3,6 +3,8 @@
 
 LOGFILE="/home/username/instalation.log"
 
+sleep 15
+
 #check network conction
 ATTEMPTS=0
 while [ $(nc -zw1 google.com 443) ] && [ "$ATTEMPTS" -lt 5 ]; do

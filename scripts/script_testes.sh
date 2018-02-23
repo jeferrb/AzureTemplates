@@ -6,16 +6,12 @@
 
 # singularity pull docker://nvidia/opencl
 
-IMAGE_PATH="$HOME/opencl.img"
+SIMPLE_SINTETIC=1
+# FOLD1000=1
+
+IMAGE_PATH="$HOME/opencl.img" #image from nvidia's dockerhub
 # IMAGE_PATH="$HOME/ruycastilho-GPUtest-master.simg"
 ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago/"
-DATASET="$HOME/seismic-data/fold1000.su"
-# DATASET="$HOME/Data/701-jequit-Data-Mute-Attenuation.su"
-# DATASET="$HOME/Data/simple-syntetic-micro_sorted.su"
-# DATASET="$HOME/Data/simple-synthetic.su"
-DATA=${DATASET##*/}
-DATA=${DATA%.su}
-
 
 REPETITIONS=3
 
@@ -27,6 +23,8 @@ declare -a EXECUTABLES=("cmp-cuda" "cmp-cudafp16" "cmp-acc" "cmp-omp2")
 
 declare -a TYPES=("host" "singularity")
 
+if [[ $JEQUITINHONHA ]]; then
+DATASET="$HOME/Data/701-jequit-Data-Mute-Attenuation.su"
 PARAM_A0="-8e-4"
 PARAM_A1="8e-4"
 PARAM_B0="-1e-7"
@@ -39,12 +37,61 @@ PARAM_NC="5"
 PARAM_APH="600"
 PARAM_APM="50"
 PARAM_TAU="0.002"
-PARAM_D="1"
-PARAM_V="4"
+PARAM_NGEN="30"
+PARAM_AZIMUTH="0"
+PARAM_D="1" # Open CL Device
+PARAM_V="4" # Verbose
 
-mkdir ${ROOT_DIR}/Result
+elif [[ $SIMPLE_SINTETIC ]]; then
+DATASET="$HOME/Data/simple-synthetic.su"
+PARAM_A0="-0.7e-3"
+PARAM_A1="0.7e-3"
+PARAM_B0="-1e-7"
+PARAM_B1="1e-7"
+PARAM_C0="1.98e-7"
+PARAM_C1="11.77e-6"
+PARAM_NA="5"
+PARAM_NB="5"
+PARAM_NC="5"
+PARAM_APH="600"
+PARAM_APM="50"
+PARAM_TAU="0.002"
+PARAM_NGEN="30"
+PARAM_AZIMUTH="0"
+PARAM_D="1" # Open CL Device
+PARAM_V="4" # Verbose
 
-clinfo > ${ROOT_DIR}/Result/clinfo
+elif [[ $FOLD1000 ]]; then
+DATASET="$HOME/seismic-data/fold1000.su"
+PARAM_A0="-0.7e-3"
+PARAM_A1="0.7e-3"
+PARAM_B0="-1e-7"
+PARAM_B1="1e-7"
+PARAM_C0="1.975e-7"
+PARAM_C1="1.384e-6"
+PARAM_NA="5"
+PARAM_NB="5"
+PARAM_NC="5"
+PARAM_APH="2600"
+PARAM_APM="50"
+PARAM_TAU="0.004"
+PARAM_NGEN="30"
+PARAM_AZIMUTH="90"
+PARAM_D="1" # Open CL Device
+PARAM_V="4" # Verbose
+fi
+
+DATA=${DATASET##*/}
+DATA=${DATA%.su}
+
+echo "Executing $DATA"
+
+RESULT_DIR="${ROOT_DIR}/result_${DATA}"
+
+mkdir ${RESULT_DIR}
+
+date > ${RESULT_DIR}/clinfo
+clinfo >> ${RESULT_DIR}/clinfo
 
 for benchmark in `seq 1 ${#NAMES[@]}`; do
 	NAME=${NAMES[benchmark]}
@@ -62,21 +109,25 @@ cat << EOF > execute_${type}.sh
 #!/bin/bash
 for i in \`seq 1 $REPETITIONS\`; do
 	time ( ./$EXECUTABLE \
+	-aph ${PARAM_APH} \
 	-c0 ${PARAM_C0} \
 	-c1 ${PARAM_C1} \
 	-nc ${PARAM_NC} \
-	-aph ${PARAM_APH} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 done
 
@@ -93,22 +144,26 @@ cat << EOF > execute_${type}.sh
 #!/bin/bash
 	for i in \`seq 1 $REPETITIONS\`; do
 	time ( ./$EXECUTABLE \
+	-aph ${PARAM_APH} \
 	-c0 ${PARAM_C0} \
 	-c1 ${PARAM_C1} \
-	-nc ${PARAM_NC} \
-	-aph ${PARAM_APH} \
-	-tau ${PARAM_TAU} \
 	-d ${PARAM_D} \
+	-nc ${PARAM_NC} \
+	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 
@@ -125,26 +180,30 @@ cat << EOF > execute_${type}.sh
 	time ( ./$EXECUTABLE \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
-	-na ${PARAM_NA} \
-	-c0 ${PARAM_C0} \
-	-c1 ${PARAM_C1} \
-	-nc ${PARAM_NC} \
-	-b0 ${PARAM_B0} \
-	-b1 ${PARAM_B1} \
-	-nb ${PARAM_NB} \
 	-aph ${PARAM_APH} \
 	-apm ${PARAM_APM} \
+	-b0 ${PARAM_B0} \
+	-b1 ${PARAM_B1} \
+	-c0 ${PARAM_C0} \
+	-c1 ${PARAM_C1} \
+	-na ${PARAM_NA} \
+	-nb ${PARAM_NB} \
+	-nc ${PARAM_NC} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 
@@ -163,26 +222,30 @@ cat << EOF > execute_${type}.sh
 	time ( ./$EXECUTABLE \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
-	-na ${PARAM_NA} \
-	-c0 ${PARAM_C0} \
-	-c1 ${PARAM_C1} \
-	-nc ${PARAM_NC} \
-	-b0 ${PARAM_B0} \
-	-b1 ${PARAM_B1} \
-	-nb ${PARAM_NB} \
 	-aph ${PARAM_APH} \
 	-apm ${PARAM_APM} \
+	-b0 ${PARAM_B0} \
+	-b1 ${PARAM_B1} \
+	-c0 ${PARAM_C0} \
+	-c1 ${PARAM_C1} \
+	-na ${PARAM_NA} \
+	-nb ${PARAM_NB} \
+	-nc ${PARAM_NC} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 fi
 
@@ -195,31 +258,35 @@ cd ${ROOT_DIR}/CRS/OpenCL
 for type in ${TYPES[@]}; do
 cat << EOF > execute_${type}.sh
 #!/bin/bash
-	for i in \`seq 1 $REPETITIONS\`; do
-		time ( ./$EXECUTABLE \
-		-a0 ${PARAM_A0} \
-		-a1 ${PARAM_A1} \
-		-na ${PARAM_NA} \
-		-c0 ${PARAM_C0} \
-		-c1 ${PARAM_C1} \
-		-nc ${PARAM_NC} \
-		-b0 ${PARAM_B0} \
-		-b1 ${PARAM_B1} \
-		-nb ${PARAM_NB} \
-		-aph ${PARAM_APH} \
-		-apm ${PARAM_APM} \
-		-tau ${PARAM_TAU} \
-		-d ${PARAM_D} \
-		-v ${PARAM_V} \
-		-i $DATASET ) \
-		>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-		2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
-	done
+for i in \`seq 1 $REPETITIONS\`; do
+	time ( ./$EXECUTABLE \
+	-a0 ${PARAM_A0} \
+	-a1 ${PARAM_A1} \
+	-aph ${PARAM_APH} \
+	-apm ${PARAM_APM} \
+	-b0 ${PARAM_B0} \
+	-b1 ${PARAM_B1} \
+	-c0 ${PARAM_C0} \
+	-c1 ${PARAM_C1} \
+	-d ${PARAM_D} \
+	-na ${PARAM_NA} \
+	-nb ${PARAM_NB} \
+	-nc ${PARAM_NC} \
+	-tau ${PARAM_TAU} \
+	-v ${PARAM_V} \
+	-i $DATASET ) \
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 #CRS-OpenMP
@@ -231,30 +298,34 @@ cd ${ROOT_DIR}/CRS/OpenMP
 for type in ${TYPES[@]}; do
 cat << EOF > execute_${type}.sh
 #!/bin/bash
-	for i in \`seq 1 $REPETITIONS\`; do
-		time ( ./$EXECUTABLE \
-		-a0 ${PARAM_A0} \
-		-a1 ${PARAM_A1} \
-		-na ${PARAM_NA} \
-		-c0 ${PARAM_C0} \
-		-c1 ${PARAM_C1} \
-		-nc ${PARAM_NC} \
-		-b0 ${PARAM_B0} \
-		-b1 ${PARAM_B1} \
-		-nb ${PARAM_NB} \
-		-aph ${PARAM_APH} \
-		-apm ${PARAM_APM} \
-		-tau ${PARAM_TAU} \
-		-v ${PARAM_V} \
-		-i $DATASET ) \
-		>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-		2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
-	done
+for i in \`seq 1 $REPETITIONS\`; do
+	time ( ./$EXECUTABLE \
+	-a0 ${PARAM_A0} \
+	-a1 ${PARAM_A1} \
+	-aph ${PARAM_APH} \
+	-apm ${PARAM_APM} \
+	-b0 ${PARAM_B0} \
+	-b1 ${PARAM_B1} \
+	-c0 ${PARAM_C0} \
+	-c1 ${PARAM_C1} \
+	-na ${PARAM_NA} \
+	-nb ${PARAM_NB} \
+	-nc ${PARAM_NC} \
+	-tau ${PARAM_TAU} \
+	-v ${PARAM_V} \
+	-i $DATASET ) \
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 if [[ ! -z "${OPENACC}" ]]; then
@@ -270,29 +341,33 @@ cat << EOF > execute_${type}.sh
 #!/bin/bash
 for i in \`seq 1 $REPETITIONS\`; do
 	time ( ./$EXECUTABLE \
-	-ngen 30 \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
-	-na ${PARAM_NA} \
-	-c0 ${PARAM_C0} \
-	-c1 ${PARAM_C1} \
-	-nc ${PARAM_NC} \
-	-b0 ${PARAM_B0} \
-	-b1 ${PARAM_B1} \
-	-nb ${PARAM_NB} \
 	-aph ${PARAM_APH} \
 	-apm ${PARAM_APM} \
+	-b0 ${PARAM_B0} \
+	-b1 ${PARAM_B1} \
+	-c0 ${PARAM_C0} \
+	-c1 ${PARAM_C1} \
+	-na ${PARAM_NA} \
+	-nb ${PARAM_NB} \
+	-nc ${PARAM_NC} \
+	-ngen ${PARAM_NGEN} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 fi
 
@@ -302,38 +377,41 @@ NAME=CRS-DE-OpenCL
 echo "Executing $NAME..."
 EXECUTABLE=bin/crs-ocl-de
 cd ${ROOT_DIR}/CRS-DE/OpenCL
-
 for type in ${TYPES[@]}; do
 cat << EOF > execute_${type}.sh
 #!/bin/bash
 for i in \`seq 1 $REPETITIONS\`; do
 	time ( ./$EXECUTABLE \
-	-ngen 30 \
-	-azimuth 0 \
 	-a0 ${PARAM_A0} \
 	-a1 ${PARAM_A1} \
-	-na ${PARAM_NA} \
-	-c0 ${PARAM_C0} \
-	-c1 ${PARAM_C1} \
-	-nc ${PARAM_NC} \
-	-b0 ${PARAM_B0} \
-	-b1 ${PARAM_B1} \
-	-nb ${PARAM_NB} \
 	-aph ${PARAM_APH} \
 	-apm ${PARAM_APM} \
-	-tau ${PARAM_TAU} \
+	-azimuth ${PARAM_AZIMUTH} \
+	-b0 ${PARAM_B0} \
+	-b1 ${PARAM_B1} \
+	-c0 ${PARAM_C0} \
+	-c1 ${PARAM_C1} \
 	-d ${PARAM_D} \
+	-na ${PARAM_NA} \
+	-nb ${PARAM_NB} \
+	-nc ${PARAM_NC} \
+	-ngen ${PARAM_NGEN} \
+	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${ROOT_DIR}/Result/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-singularity exec --nv $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/host
+mv *.su ${RESULT_DIR}/output_${NAME}/host
+singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 cd ${ROOT_DIR}
-ls Result
+ls ${RESULT_DIR}

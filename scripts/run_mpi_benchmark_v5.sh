@@ -13,7 +13,7 @@ NUMBER_INSTANCES=${4}
 VM_SIZE=${VM_SIZES[${3}]}
 NUMBER_RROCESSORS=${VM_CORES[${3}]}
 NUMBER_JOBS=`echo "${NUMBER_INSTANCES} * ${NUMBER_RROCESSORS}" | bc`
-RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_result"
+RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_date_$(date +%s)_result"
 LOG_DIR="results/${VM_SIZE}_${NUMBER_INSTANCES}_${NUMBER_REPETITIONS}_${GROUP_NAME}"
 LOG_FILE="${LOG_DIR}/logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log"
 
@@ -92,10 +92,6 @@ done
 scp scripts/run_bench.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
 # rm ${LOG_DIR}/hostfile
 
-
-set +x
-
-
 ssh ${SSH_ADDR} << EOF
     set -x
     # Add all nodes to known hosts and copy the private key to all machines
@@ -116,31 +112,23 @@ ssh ${SSH_ADDR} << EOF
 EOF
 mkdir -p ${RESULTS_DIRECTORY}
 scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
-scp "${SSH_ADDR}:/home/username/*.sa" ${RESULTS_DIRECTORY}
+# scp -r "${SSH_ADDR}:/home/username/results" ${RESULTS_DIRECTORY}
 
 # pause "Press [Enter] key to delete the group ${GROUP_NAME}"
 echo "To tedeleting the resource ${GROUP_NAME}"
-# az group delete --resource-group ${GROUP_NAME} --yes --no-wait
-# usage example
+az group delete --resource-group ${GROUP_NAME} --yes --no-wait
  
-az vm deallocate --no-wait --ids $(
-    az vm list --query "[].id" -o tsv | grep -i "${GROUP_NAME}"
-)
-
-set +x
-
+# az vm deallocate --no-wait --ids $(
+#     az vm list --query "[].id" -o tsv | grep -i "${GROUP_NAME}"
+# )
 
 # az vm list --query "[].id" -o tsv | grep -i "${GROUP_NAME}"
 # example usage
 # az vm start --no-wait --ids $(
 #     az vm list --query "[].id" -o tsv | grep -i "${GROUP_NAME}"
 # )
- 
-# az vm stop --no-wait --ids $(
-#     az vm list --query "[].id" -o tsv | grep -i "${GROUP_NAME}"
-# )
 
-# MOUNTPOINT=~/mountpoint/
+# MOUNTPOINT=$HOME/mountpoint/
 # if [ -d "$MOUNTPOINT" ]; then
 #     cp -r results "$MOUNTPOINT/results_$(whoami)$(date +%s)"
 # fi
