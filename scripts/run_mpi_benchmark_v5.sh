@@ -12,19 +12,13 @@ declare -a VM_CORES=("1" "1" "2" "4" "8" "1" "1" "1" "8" "16" "2" "2" "2" "4" "8
 NUMBER_INSTANCES=${4}
 VM_SIZE=${VM_SIZES[${3}]}
 NUMBER_RROCESSORS=${VM_CORES[${3}]}
-NUMBER_JOBS=`echo "${NUMBER_INSTANCES} * ${NUMBER_RROCESSORS}" | bc`
+NUMBER_JOBS="$((${NUMBER_INSTANCES} * ${NUMBER_RROCESSORS}))"
 RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_date_$(date +%s)_result"
 LOG_DIR="results/${VM_SIZE}_${NUMBER_INSTANCES}_${NUMBER_REPETITIONS}_${GROUP_NAME}"
 LOG_FILE="${LOG_DIR}/logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log"
 
-MINWAIT=120
-MAXWAIT=300
-MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
-
 createMachines(){
     echo "Creating the machine number $1"
-    # az group deployment create --verbose --debug --name SingularityTest --resource-group $GROUP_NAME \
-    # --template-uri "https://raw.githubusercontent.com/jeferrb/AzureTemplates/master/azuredeploy.json" \
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
     --template-file azuredeploy_non_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
@@ -69,12 +63,6 @@ fi
 # Create an id RSA for the coordenator
 ssh ${SSH_ADDR} << EOF
     ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-    FILE=~/.ssh/id_rsa.pub
-    if [ ! -e "\$FILE" ]; then
-        # if there is not an rsa key, create it
-        echo "File \$FILE does not exist"
-        ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-    fi
 EOF
 
 # copy coordinator (master) credential to all slaves
@@ -85,7 +73,7 @@ for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
 done
 
 rm ${LOG_DIR}/hostfile
-for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)`; do
+for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3))`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
@@ -96,12 +84,12 @@ ssh ${SSH_ADDR} << EOF
     set -x
     # Add all nodes to known hosts and copy the private key to all machines
     rm ~/.ssh/known_hosts
-    for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+    for host in \`seq 4 $((${NUMBER_INSTANCES}+3)); do
         ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
         scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
     done
     # Copy known host that contains all machines to all machines
-    for host in \`seq 4 $(echo ${NUMBER_INSTANCES}+3 | bc)\`; do
+    for host in \`seq 4 $((${NUMBER_INSTANCES}+3)); do
         scp .ssh/known_hosts "10.0.0.\${host}":.ssh
     done
 EOF
