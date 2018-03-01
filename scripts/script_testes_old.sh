@@ -9,8 +9,6 @@ DATASET="/home/username/Data/701-jequit-Data-Mute-Attenuation.su"
 DATA=${DATASET##*/}
 DATA=${DATA%.su}
 
-OPENACC=
-
 declare -a DIRECTORIES=("CMP/CUDA" "CMP/CUDAfp16" "CMP/OpenACC" "CMP/OpenMP")
 declare -a NAMES=("CMP-CUDA" "CMP-CUDAfp16" "CMP-OpenACC" "CMP-OpenMP")
 declare -a EXECUTABLES=("cmp-cuda" "cmp-cudafp16" "cmp-acc" "cmp-omp2" )
@@ -39,19 +37,6 @@ for benchmark in `seq 1 ${#NAMES[@]}`; do
 		-i $DATASET \
 		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
 	done
-	TYPE=singularity
-	singularity exec --nv $IMAGE_PATH bash -c "\
-		for i in 1 .. $REPETITIONS; do
-			./$EXECUTABLE \
-			-c0 1.98e-7 \
-			-c1 1.77e-6 \
-			-nc 5 \
-			-aph 600 \
-			-tau 0.002 \
-			-v 4 \
-			-i $DATASET \
-			>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-		done "
 done
 
 
@@ -76,22 +61,6 @@ for i in 1 .. $REPETITIONS; do
 	-i $DATASET \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
 done
-
-TYPE=singularity
-
-singularity exec --nv $IMAGE_PATH bash -c "\
-	for i in 1 .. $REPETITIONS; do
-	./$EXECUTABLE \
-	-c0 1.98e-7 \
-	-c1 1.77e-6 \
-	-nc 5 \
-	-aph 600 \
-	-tau 0.002 \
-	-d 1 \
-	-v 4 \
-	-i $DATASET \
-	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-done"
 
 
 #CRS-CUDA
@@ -120,10 +89,14 @@ for i in 1 .. $REPETITIONS; do
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
 done
 
-TYPE=singularity
+#CRS-OpenACC
+NAME=CRS-OpenACC
+EXECUTABLE=bin/crs-acc
+cd ${ROOT_DIR}/CRS/OpenACC
 
-singularity exec --nv $IMAGE_PATH bash -c "\
-	for i in 1 .. $REPETITIONS; do
+TYPE=host
+
+for i in 1 .. $REPETITIONS; do
 	./$EXECUTABLE \
 	-a0 -0.7e-3 \
 	-a1 0.7e-3 \
@@ -140,59 +113,7 @@ singularity exec --nv $IMAGE_PATH bash -c "\
 	-v 4 \
 	-i $DATASET \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-done"
-
-
-if [[ -z "${OPENACC}" ]]; then
-
-	#CRS-OpenACC
-	NAME=CRS-OpenACC
-	EXECUTABLE=bin/crs-acc
-	cd ${ROOT_DIR}/CRS/OpenACC
-
-	TYPE=host
-
-	for i in 1 .. $REPETITIONS; do
-		./$EXECUTABLE \
-		-a0 -0.7e-3 \
-		-a1 0.7e-3 \
-		-na 5 \
-		-c0 1.98e-7 \
-		-c1 1.77e-6 \
-		-nc 5 \
-		-b0 -1e-7 \
-		-b1 1e-7 \
-		-nb 5 \
-		-aph 600 \
-		-apm 50 \
-		-tau 0.002 \
-		-v 4 \
-		-i $DATASET \
-		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done
-
-	TYPE=singularity
-
-	singularity exec --nv $IMAGE_PATH bash -c "\
-		for i in 1 .. $REPETITIONS; do
-		./$EXECUTABLE \
-		-a0 -0.7e-3 \
-		-a1 0.7e-3 \
-		-na 5 \
-		-c0 1.98e-7 \
-		-c1 1.77e-6 \
-		-nc 5 \
-		-b0 -1e-7 \
-		-b1 1e-7 \
-		-nb 5 \
-		-aph 600 \
-		-apm 50 \
-		-tau 0.002 \
-		-v 4 \
-		-i $DATASET \
-		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done"
-fi
+done
 
 #CRS-OpenCL
 NAME=CRS-OpenCL
@@ -221,29 +142,6 @@ for i in 1 .. $REPETITIONS; do
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
 done
 
-TYPE=singularity
-
-singularity exec --nv $IMAGE_PATH bash -c "\
-	for i in 1 .. $REPETITIONS; do
-		./$EXECUTABLE \
-		-a0 -0.7e-3 \
-		-a1 0.7e-3 \
-		-na 5 \
-		-c0 1.98e-7 \
-		-c1 1.77e-6 \
-		-nc 5 \
-		-b0 -1e-7 \
-		-b1 1e-7 \
-		-nb 5 \
-		-aph 600 \
-		-apm 50 \
-		-tau 0.002 \
-		-d 1 \
-		-v 4 \
-		-i $DATASET \
-		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done"
-
 #CRS-OpenMP
 NAME=CRS-OpenMP
 EXECUTABLE=bin/crs-omp2
@@ -270,81 +168,33 @@ for i in 1 .. $REPETITIONS; do
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
 done
 
-TYPE=singularity
 
-singularity exec --nv $IMAGE_PATH bash -c "\
-	for i in 1 .. $REPETITIONS; do
-		./$EXECUTABLE \
-		-a0 -0.7e-3 \
-		-a1 0.7e-3 \
-		-na 5 \
-		-c0 1.98e-7 \
-		-c1 1.77e-6 \
-		-nc 5 \
-		-b0 -1e-7 \
-		-b1 1e-7 \
-		-nb 5 \
-		-aph 600 \
-		-apm 50 \
-		-tau 0.002 \
-		-v 4 \
-		-i $DATASET \
-		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done"
+#CRS-DE-OpenACC
+NAME=CRS-DE-OpenACC
+EXECUTABLE=bin/crs-acc-de
+cd ${ROOT_DIR}/CRS/OpenACC
 
-if [[ -z "${OPENACC}" ]]; then
+TYPE=host
 
-	#CRS-DE-OpenACC
-	NAME=CRS-DE-OpenACC
-	EXECUTABLE=bin/crs-acc-de
-	cd ${ROOT_DIR}/CRS/OpenACC
-
-	TYPE=host
-
-	for i in 1 .. $REPETITIONS; do
-	./$EXECUTABLE \
-	-ngen 30 \
-	-a0 -0.7e-3 \
-	-a1 0.7e-3 \
-	-na 5 \
-	-c0 1.98e-7 \
-	-c1 1.77e-6 \
-	-nc 5 \
-	-b0 -1e-7 \
-	-b1 1e-7 \
-	-nb 5 \
-	-aph 600 \
-	-apm 50 \
-	-tau 0.002 \
-	-v 4 \
-	-i $DATASET \
-	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done
-
-	TYPE=singularity
-
-	singularity exec --nv $IMAGE_PATH bash -c "\
-	for i in 1 .. $REPETITIONS; do
-		./$EXECUTABLE \
-		-ngen 30 \
-		-a0 -0.7e-3 \
-		-a1 0.7e-3 \
-		-na 5 \
-		-c0 1.98e-7 \
-		-c1 1.77e-6 \
-		-nc 5 \
-		-b0 -1e-7 \
-		-b1 1e-7 \
-		-nb 5 \
-		-aph 600 \
-		-apm 50 \
-		-tau 0.002 \
-		-v 4 \
-		-i $DATASET \
-		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done"
-fi
-
+for i in 1 .. $REPETITIONS; do
+./$EXECUTABLE \
+-ngen 30 \
+-a0 -0.7e-3 \
+-a1 0.7e-3 \
+-na 5 \
+-c0 1.98e-7 \
+-c1 1.77e-6 \
+-nc 5 \
+-b0 -1e-7 \
+-b1 1e-7 \
+-nb 5 \
+-aph 600 \
+-apm 50 \
+-tau 0.002 \
+-v 4 \
+-i $DATASET \
+>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
+done
 
 #CRS-DE-OpenCL
 NAME=CRS-DE-OpenCL
@@ -374,28 +224,3 @@ for i in 1 .. $REPETITIONS; do
 	-i $DATASET \
 	>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
 done
-
-TYPE=singularity
-
-singularity exec --nv $IMAGE_PATH bash -c "\
-	for i in 1 .. $REPETITIONS; do
-		./$EXECUTABLE \
-		-ngen 30 \
-		-azimuth 0 \
-		-a0 -0.7e-3 \
-		-a1 0.7e-3 \
-		-na 5 \
-		-c0 1.98e-7 \
-		-c1 1.77e-6 \
-		-nc 5 \
-		-b0 -1e-7 \
-		-b1 1e-7 \
-		-nb 5 \
-		-aph 600 \
-		-apm 50 \
-		-tau 0.002 \
-		-d 1 \
-		-v 4 \
-		-i $DATASET \
-		>> ${ROOT_DIR}/Result/"$NAME"_"$TYPE"_${DATA}.txt
-	done"

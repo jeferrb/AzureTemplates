@@ -104,7 +104,7 @@ for host in `seq 4 $((${NUMBER_INSTANCES}+3))`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
-scp scripts/run_bench.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
+scp ${LOG_DIR}/hostfile ${SSH_ADDR}:
 
 ssh ${SSH_ADDR} << EOF
     set -x

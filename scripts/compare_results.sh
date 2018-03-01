@@ -23,3 +23,6 @@ for algorithm in $ALGORITHMS; do
         done
     done
 done
+
+# sudiff CUDA/crs.stack.su OpenMP/crs.stack.su > diff.su
+# suximage < diff.su legend=1
