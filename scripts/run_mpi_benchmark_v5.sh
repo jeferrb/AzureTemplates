@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the number of instances
-
+ # 1=Senha123
+ # 2="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
+ # 3=1
+ # 4=32
 set -x
 # cd $HOME/AzureTemplates
 GROUP_NAME=mpi${RANDOM}
@@ -73,7 +76,7 @@ for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
 done
 
 rm ${LOG_DIR}/hostfile
-for host in `seq 4 $(echo ${NUMBER_INSTANCES}+3))`; do
+for host in `seq 4 $((${NUMBER_INSTANCES}+3))`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
@@ -84,12 +87,12 @@ ssh ${SSH_ADDR} << EOF
     set -x
     # Add all nodes to known hosts and copy the private key to all machines
     rm ~/.ssh/known_hosts
-    for host in \`seq 4 $((${NUMBER_INSTANCES}+3)); do
+    for host in \`seq 4 $((${NUMBER_INSTANCES}+3))\`; do
         ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
         scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
     done
     # Copy known host that contains all machines to all machines
-    for host in \`seq 4 $((${NUMBER_INSTANCES}+3)); do
+    for host in \`seq 4 $((${NUMBER_INSTANCES}+3))\`; do
         scp .ssh/known_hosts "10.0.0.\${host}":.ssh
     done
 EOF
