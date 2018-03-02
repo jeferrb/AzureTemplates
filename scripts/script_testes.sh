@@ -5,11 +5,11 @@
 # export ACC_DEVICE_TYPE=host
 
 # singularity pull docker://nvidia/opencl
+# set -x
+# SIMPLE_SINTETIC=1
+FOLD1000=1
 
-SIMPLE_SINTETIC=1
-# FOLD1000=1
-
-IMAGE_PATH="$HOME/opencl.img" #image from nvidia's dockerhub
+IMAGE_PATH="$HOME/opencl.*img" #image from nvidia's dockerhub
 # IMAGE_PATH="$HOME/ruycastilho-GPUtest-master.simg"
 ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago/"
 
@@ -21,9 +21,12 @@ declare -a DIRECTORIES=("CMP/CUDA" "CMP/CUDAfp16" "CMP/OpenACC" "CMP/OpenMP")
 declare -a NAMES=("CMP-CUDA" "CMP-CUDAfp16" "CMP-OpenACC" "CMP-OpenMP")
 declare -a EXECUTABLES=("cmp-cuda" "cmp-cudafp16" "cmp-acc" "cmp-omp2")
 
-declare -a TYPES=("host" "singularity")
+declare -a TYPES=("host" "singularity")ca
 
-if [[ $JEQUITINHONHA ]]; then
+PARAM_D="1" # Open CL Device
+PARAM_V="4" # Verbose
+
+if [[ $JEQUITINHONHA -eq 1 ]]; then
 DATASET="$HOME/Data/701-jequit-Data-Mute-Attenuation.su"
 PARAM_A0="-8e-4"
 PARAM_A1="8e-4"
@@ -39,29 +42,8 @@ PARAM_APM="50"
 PARAM_TAU="0.002"
 PARAM_NGEN="30"
 PARAM_AZIMUTH="0"
-PARAM_D="1" # Open CL Device
-PARAM_V="4" # Verbose
 
-elif [[ $SIMPLE_SINTETIC ]]; then
-DATASET="$HOME/Data/simple-synthetic.su"
-PARAM_A0="-0.7e-3"
-PARAM_A1="0.7e-3"
-PARAM_B0="-1e-7"
-PARAM_B1="1e-7"
-PARAM_C0="1.98e-7"
-PARAM_C1="11.77e-6"
-PARAM_NA="5"
-PARAM_NB="5"
-PARAM_NC="5"
-PARAM_APH="600"
-PARAM_APM="50"
-PARAM_TAU="0.002"
-PARAM_NGEN="30"
-PARAM_AZIMUTH="0"
-PARAM_D="1" # Open CL Device
-PARAM_V="4" # Verbose
-
-elif [[ $FOLD1000 ]]; then
+elif [[ $FOLD1000 -eq 1 ]]; then
 DATASET="$HOME/seismic-data/fold1000.su"
 PARAM_A0="-0.7e-3"
 PARAM_A1="0.7e-3"
@@ -77,8 +59,24 @@ PARAM_APM="50"
 PARAM_TAU="0.004"
 PARAM_NGEN="30"
 PARAM_AZIMUTH="90"
-PARAM_D="1" # Open CL Device
-PARAM_V="4" # Verbose
+
+elif [[ $SIMPLE_SINTETIC -eq 1 ]]; then
+DATASET="$HOME/Data/simple-synthetic.su"
+PARAM_A0="-0.7e-3"
+PARAM_A1="0.7e-3"
+PARAM_B0="-1e-7"
+PARAM_B1="1e-7"
+PARAM_C0="1.98e-7"
+PARAM_C1="11.77e-6"
+PARAM_NA="5"
+PARAM_NB="5"
+PARAM_NC="5"
+PARAM_APH="600"
+PARAM_APM="50"
+PARAM_TAU="0.002"
+PARAM_NGEN="30"
+PARAM_AZIMUTH="0"
+
 fi
 
 DATA=${DATASET##*/}
@@ -88,7 +86,7 @@ echo "Executing $DATA"
 
 RESULT_DIR="${ROOT_DIR}/result_${DATA}"
 
-mkdir ${RESULT_DIR}
+mkdir -p ${RESULT_DIR}
 
 date > ${RESULT_DIR}/clinfo
 clinfo >> ${RESULT_DIR}/clinfo
@@ -123,10 +121,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 done
@@ -159,10 +157,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
@@ -199,10 +197,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
@@ -241,10 +239,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 fi
@@ -282,10 +280,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
@@ -321,10 +319,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
@@ -363,10 +361,10 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 fi
@@ -406,12 +404,14 @@ EOF
 chmod +x execute_${type}.sh
 done
 ./execute_host.sh
-mkdir ${RESULT_DIR}/output_${NAME}/host
+mkdir -p ${RESULT_DIR}/output_${NAME}/host
 mv *.su ${RESULT_DIR}/output_${NAME}/host
 singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-mkdir ${RESULT_DIR}/output_${NAME}/singularity
+mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 cd ${ROOT_DIR}
 ls ${RESULT_DIR}
+
+# set +x

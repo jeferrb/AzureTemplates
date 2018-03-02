@@ -17,16 +17,22 @@
     sudo bash -c 'echo "blacklist lbm-nouveau" >> /etc/modprobe.d/nouveau.conf'
 
 #Reboot the VM and reconnect. Exit X server:
+    sudo systemctl stop lightdm.service
 
     # sudo systemctl stop lightdm.service
     # wget -O NVIDIA-Linux-x86_64-384.73-grid.run https://go.microsoft.com/fwlink/?linkid=849941
     # chmod +x NVIDIA-Linux-x86_64-384.73-grid.run
     # sudo ./NVIDIA-Linux-x86_64-384.73-grid.run --ui=none --no-questions --accept-license --disable-nouveau
 
-    sudo systemctl stop lightdm.service
-    wget -O NVIDIA-Linux-x86_64-375.39.run http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
-    chmod +x NVIDIA-Linux-x86_64-375.39.run
-    sudo sudo ./NVIDIA-Linux-x86_64-375.39.run --ui=none --no-questions --accept-license --disable-nouveau
+    # sudo systemctl stop lightdm.service
+    # wget -O NVIDIA-Linux-x86_64-375.39.run http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
+    # chmod +x NVIDIA-Linux-x86_64-375.39.run
+    # sudo ./NVIDIA-Linux-x86_64-375.39.run --ui=none --no-questions --accept-license --
+
+
+    wget -O NVIDIA-Linux-x86_64-375.51.run http://us.download.nvidia.com/XFree86/Linux-x86_64/375.51/NVIDIA-Linux-x86_64-375.51.run
+    chmod +x NVIDIA-Linux-x86_64-375.51.run
+    sudo ./NVIDIA-Linux-x86_64-375.51.run --ui=none --no-questions --accept-license --disable-nouveau
 
     
     # ./NVIDIA-Linux-x86_64-375.39.run -x
