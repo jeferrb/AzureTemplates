@@ -26,3 +26,5 @@ done
 
 # sudiff CUDA/crs.stack.su OpenMP/crs.stack.su > diff.su
 # suximage < diff.su legend=1
+# sudiff CRS/CUDA/crs.stack.su CMP/CUDA/cmp.stack.su | suximage
+# suximage < CRS/CUDA/crs.stack.su &

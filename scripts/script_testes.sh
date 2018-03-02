@@ -9,7 +9,7 @@
 # SIMPLE_SINTETIC=1
 FOLD1000=1
 
-IMAGE_PATH="$HOME/opencl.*img" #image from nvidia's dockerhub
+IMAGE_PATH="$HOME/opencl.img" #image from nvidia's dockerhub
 # IMAGE_PATH="$HOME/ruycastilho-GPUtest-master.simg"
 ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago/"
 
@@ -44,7 +44,7 @@ PARAM_NGEN="30"
 PARAM_AZIMUTH="0"
 
 elif [[ $FOLD1000 -eq 1 ]]; then
-DATASET="$HOME/seismic-data/fold1000.su"
+DATASET="$HOME/Data/fold1000.su"
 PARAM_A0="-0.7e-3"
 PARAM_A1="0.7e-3"
 PARAM_B0="-1e-7"
@@ -81,6 +81,11 @@ fi
 
 DATA=${DATASET##*/}
 DATA=${DATA%.su}
+
+if [ ! -e  $DATASET ]; then
+    echo " * * * * * * * * * * * * * * * * * * * * * * * * * Dataset not found! * * * * * * * * * * * * * * * * * * * * * * * * * "
+    # exit
+fi
 
 echo "Executing $DATA"
 
