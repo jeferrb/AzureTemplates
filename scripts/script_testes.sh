@@ -89,9 +89,10 @@ fi
 
 echo "Executing $DATA"
 
-RESULT_DIR="${ROOT_DIR}/result_${DATA}"
+RESULT_DIR="${ROOT_DIR}/result_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_`date +%d-%m-%Y`"
 
 mkdir -p ${RESULT_DIR}
+
 
 date > ${RESULT_DIR}/clinfo
 clinfo >> ${RESULT_DIR}/clinfo
