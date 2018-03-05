@@ -44,7 +44,7 @@ for (( i = 1; i < $NUMBER_INSTANCES + 1 ; i++ )); do
 done
 wait
 #wait while to create the least machine
-sleep 90
+sleep 190
 
 echo "******************************************"  >> ${LOG_FILE}
 
