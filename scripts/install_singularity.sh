@@ -69,13 +69,16 @@ wait
 echo cp "*************** Install Singularity" &>> ${LOGFILE}
 # Install Singularity
 VERSION=2.4.2
-wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
-tar xvf singularity-$VERSION.tar.gz
+# wget -q https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz
+# tar xvf singularity-$VERSION.tar.gz
+# cd singularity-$VERSION
+# echo "libgomp.so" >> etc/nvliblist.conf
+# ./configure --prefix=/usr/local | tee -a ${LOGFILE}
+# make -j | tee -a ${LOGFILE}
+cd /home/username/
+tar -zxvf /home/username/mymountpoint/singularity-2.4.2.tar.gz
 cd singularity-$VERSION
-echo "libgomp.so" >> etc/nvliblist.conf
-./configure --prefix=/usr/local &>> ${LOGFILE}
-make -j &>> ${LOGFILE}
-sudo make install
+sudo make install | tee -a ${LOGFILE}
 
 
 # cd /home/username/
@@ -88,7 +91,7 @@ sudo make install
 # EOT
 # source ~/.bashrc
 
-echo "done" > donefile
+echo "done" > /home/username/donefile
 
 # cp /home/username/mymountpoint/ubuntu.img /home/username/
 
