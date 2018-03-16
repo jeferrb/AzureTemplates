@@ -7,7 +7,7 @@
     sudo apt-get install build-essential gcc make -y
 
 
-
+# sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 
 # Disable the Nouveau kernel driver, which is incompatible with the NVIDIA driver. (Only use the NVIDIA driver on NV VMs.) To do this, create a file in /etc/modprobe.d named nouveau.conf
@@ -19,10 +19,10 @@
 #Reboot the VM and reconnect. Exit X server:
     sudo systemctl stop lightdm.service
 
-    # sudo systemctl stop lightdm.service
-    # wget -O NVIDIA-Linux-x86_64-384.73-grid.run https://go.microsoft.com/fwlink/?linkid=849941
-    # chmod +x NVIDIA-Linux-x86_64-384.73-grid.run
-    # sudo ./NVIDIA-Linux-x86_64-384.73-grid.run --ui=none --no-questions --accept-license --disable-nouveau
+    sudo systemctl stop lightdm.service
+    wget -O NVIDIA-Linux-x86_64-384.73-grid.run https://go.microsoft.com/fwlink/?linkid=849941
+    chmod +x NVIDIA-Linux-x86_64-384.73-grid.run
+    sudo ./NVIDIA-Linux-x86_64-384.73-grid.run --ui=none --no-questions --accept-license --disable-nouveau
 
     # sudo systemctl stop lightdm.service
     # wget -O NVIDIA-Linux-x86_64-375.39.run http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
@@ -30,9 +30,9 @@
     # sudo ./NVIDIA-Linux-x86_64-375.39.run --ui=none --no-questions --accept-license --
 
 
-    wget -O NVIDIA-Linux-x86_64-375.51.run http://us.download.nvidia.com/XFree86/Linux-x86_64/375.51/NVIDIA-Linux-x86_64-375.51.run
-    chmod +x NVIDIA-Linux-x86_64-375.51.run
-    sudo ./NVIDIA-Linux-x86_64-375.51.run --ui=none --no-questions --accept-license --disable-nouveau
+    # wget -O NVIDIA-Linux-x86_64-375.51.run http://us.download.nvidia.com/XFree86/Linux-x86_64/375.51/NVIDIA-Linux-x86_64-375.51.run
+    # chmod +x NVIDIA-Linux-x86_64-375.51.run
+    # sudo ./NVIDIA-Linux-x86_64-375.51.run --ui=none --no-questions --accept-license --disable-nouveau
 
     
     # ./NVIDIA-Linux-x86_64-375.39.run -x
@@ -54,8 +54,8 @@
 
 #Cuda:
 
-    # CUDA_REPO_PKG=cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
-    CUDA_REPO_PKG=cuda-8-0_8.0.61-1_amd64.deb
+    CUDA_REPO_PKG=cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
+    # CUDA_REPO_PKG=cuda-8-0_8.0.61-1_amd64.deb
     wget -O /tmp/${CUDA_REPO_PKG} http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/${CUDA_REPO_PKG}
     sudo dpkg -i /tmp/${CUDA_REPO_PKG}
     sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
@@ -69,6 +69,10 @@
     sudo apt install -y ocl-icd-opencl-dev
     # sudo yum install ocl-icd ocl-icd-devel mesa-libGL-devel -y
 
+sudo reboot now
+
+if [[ $OLD_GCC ]]; then
+    #statements
     sudo apt-get -y purge gcc
     sudo apt-get -y autoclean
     sudo apt-get -y autoremove
@@ -79,8 +83,9 @@
     sudo apt-get -y update
     sudo apt-get -y install gcc-4.8
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50
+fi
+
 #Reboot the VM and proceed to verify the installation.
-sudo reboot now
 
 if [[ $SINGULARITY ]]; then
     sudo apt-get install -y wget make gcc libgfortran3 tmux htop git sysstat libibnetdisc-dev openmpi-bin libopenmpi-dev libhdf5-openmpi-dev bc automake m4

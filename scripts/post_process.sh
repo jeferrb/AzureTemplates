@@ -15,6 +15,10 @@ done
 find . -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'" \; > result_all.txt
 find . -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'" \; > result_kernel.txt
 
+# sudiff CRS/CUDA/crs.stack.su CMP/CUDA/cmp.stack.su | suximage
+# sudiff CUDA/crs.stack.su OpenMP/crs.stack.su > diff.su
+# suximage < CRS/CUDA/crs.stack.su &
+
 
 # - - - - - - - - MPI - - - - - - - - - -
 find . -type f -print  -name "*.A.*.log" -exec sh -c "cat {} | grep 'seconds\|Running'" \; > result

@@ -116,3 +116,9 @@ AZURE_MACHINES=1
 NUMBER_INSTANCES=32
 ./scripts/run_mpi_benchmark_v5.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
 
+
+
+AZURE_MACHINES=23
+NUMBER_INSTANCES=2
+./scripts/run_mpi_benchmark_v5.sh Senha123 gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
+
