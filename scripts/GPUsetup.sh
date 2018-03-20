@@ -6,7 +6,7 @@
     sudo apt-get install build-essential ubuntu-desktop make -y tmux zsh clinfo
     sudo apt-get install build-essential gcc make -y
 
-
+SINGULARITY=1
 # sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 
@@ -66,6 +66,9 @@
     bash -c 'echo "export PATH=/usr/local/cuda-9.1/bin${PATH:+:${PATH}}" >> .bashrc'
     bash -c 'echo "export LD_LIBRARY_PATH=/usr/local/cuda-9.1/lib64\${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> .bashrc'
 
+    sudo bash -c 'echo "export PATH=/usr/local/cuda-9.1/bin${PATH:+:${PATH}}" >> .zshrc'
+    sudo bash -c 'echo "export LD_LIBRARY_PATH=/usr/local/cuda-9.1/lib64\${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> .zshrc'
+
     sudo apt install -y ocl-icd-opencl-dev
     # sudo yum install ocl-icd ocl-icd-devel mesa-libGL-devel -y
 
@@ -98,15 +101,9 @@ if [[ $SINGULARITY ]]; then
     ./configure --prefix=/usr/local
     make -j
     sudo make install
-    cd
-    sudo mkdir /home/username/mymountpoint
-    echo "${1}" > pass
-    echo "gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg==" > pass
-    sudo bash -c 'echo "//test1diag281.file.core.windows.net/shared-fs /home/username/mymountpoint cifs nofail,vers=3.0,username=test1diag281,password=`cat pass`,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
-    rm pass
-    sudo mount -a
 fi
 
+cd
 sudo mkdir /home/username/mymountpoint
 echo "${1}" > pass
 echo "gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg==" > pass
