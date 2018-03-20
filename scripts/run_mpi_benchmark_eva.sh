@@ -77,6 +77,7 @@ for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
 mkdir $HOME/shared_fs
 sudo bash -c 'echo "//disco123.file.core.windows.net/shared $HOME/shared_fs cifs nofail,vers=3.0,username=disco123,password=vHjb5pXkkOO4RQlHWAehIExiclRtth14qpxEYKDHamJWLMbY23M+u/6iwbwRJUbAgUzGoQboj/syz0moB2PJZw==,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
 sudo mount -a
+cp shared_fs/ubuntu.img .
 EOF
 done
 

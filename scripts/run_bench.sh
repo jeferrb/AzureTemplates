@@ -32,7 +32,7 @@ run_bench() {
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile singularity exec $HOME/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
     date | tee -a "${name}_singularity.log"
     echo | tee -a "${name}_singularity.log"
   done
