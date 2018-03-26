@@ -6,7 +6,7 @@ NUMBER_REPETITIONS=${1}
 BIN_PATH=${2}
 TOTAL_CORES=${3}
 declare -a BENCHS=(bt cg dt ep ft is lu mg sp)
-$SIZE=64
+SIZE=64
 
 # run_bench(bench, class, nprocs, repetitions, path, nprocessors)
 run_bench() {
