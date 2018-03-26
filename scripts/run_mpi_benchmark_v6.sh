@@ -11,7 +11,7 @@ set -x
 # cd $HOME/AzureTemplates
 GROUP_NAME=mpi${RANDOM}
 BIN_PATH="$HOME/mymountpoint/NPB3.3-MPI/bin/"
-NEW_BIN_PATH="$HOME/"
+NEW_BIN_PATH="$HOME/bin"
 NUMBER_REPETITIONS=5
 REGION="West US 2"
 

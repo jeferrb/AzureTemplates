@@ -16,6 +16,7 @@ ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago"
 REPETITIONS=10
 
 OPENACC=
+OPENMP=
 
 declare -a DIRECTORIES=("CMP/CUDA" "CMP/CUDAfp16" "CMP/OpenACC") # "CMP/OpenMP")
 declare -a NAMES=("CMP-CUDA" "CMP-CUDAfp16" "CMP-OpenACC") # "CMP-OpenMP")
@@ -53,7 +54,8 @@ PARAM_C0="1.975e-7"
 PARAM_C1="1.384e-6"
 PARAM_NA="5"
 PARAM_NB="5"
-PARAM_NC="101"
+PARAM_NC="5"
+PARAM_NC_CMP="5"
 PARAM_APH="2600"
 PARAM_APM="50"
 PARAM_TAU="0.004"
@@ -139,7 +141,7 @@ mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 done
 
 
-PARAM_NC="5"
+PARAM_NC=${PARAM_NC_CMP}
 
 #CMP-OpenCL
 NAME=CMP-OpenCL
@@ -303,45 +305,49 @@ mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
-# #CRS-OpenMP
-# NAME=CRS-OpenMP
-# 	echo "Executing $NAME..."
-echo `date`
-# EXECUTABLE=bin/crs-omp2
-# cd ${ROOT_DIR}/CRS/OpenMP
 
-# for type in ${TYPES[@]}; do
-# cat << EOF > execute_${type}.sh
-# #!/bin/bash
-# for i in \`seq 1 $REPETITIONS\`; do
-# 	time ( ./$EXECUTABLE \
-# 	-a0 ${PARAM_A0} \
-# 	-a1 ${PARAM_A1} \
-# 	-aph ${PARAM_APH} \
-# 	-apm ${PARAM_APM} \
-# 	-b0 ${PARAM_B0} \
-# 	-b1 ${PARAM_B1} \
-# 	-c0 ${PARAM_C0} \
-# 	-c1 ${PARAM_C1} \
-# 	-na ${PARAM_NA} \
-# 	-nb ${PARAM_NB} \
-# 	-nc ${PARAM_NC} \
-# 	-tau ${PARAM_TAU} \
-# 	-v ${PARAM_V} \
-# 	-i $DATASET ) \
-# 	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-# 	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
-# done
-# EOF
-# chmod +x execute_${type}.sh
-# done
-# ./execute_host.sh
-# mkdir -p ${RESULT_DIR}/output_${NAME}/host
-# mv *.su ${RESULT_DIR}/output_${NAME}/host
-# singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
-# mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
-# mv *.su ${RESULT_DIR}/output_${NAME}/singularity
-# # rm execute_*.sh
+if [[ ! -z "${OPENMP}" ]]; then
+
+	#CRS-OpenMP
+	NAME=CRS-OpenMP
+		echo "Executing $NAME..."
+	EXECUTABLE=bin/crs-omp2
+	echo `date`
+	cd ${ROOT_DIR}/CRS/OpenMP
+
+	for type in ${TYPES[@]}; do
+	cat << EOF > execute_${type}.sh
+	#!/bin/bash
+	for i in \`seq 1 $REPETITIONS\`; do
+		time ( ./$EXECUTABLE \
+		-a0 ${PARAM_A0} \
+		-a1 ${PARAM_A1} \
+		-aph ${PARAM_APH} \
+		-apm ${PARAM_APM} \
+		-b0 ${PARAM_B0} \
+		-b1 ${PARAM_B1} \
+		-c0 ${PARAM_C0} \
+		-c1 ${PARAM_C1} \
+		-na ${PARAM_NA} \
+		-nb ${PARAM_NB} \
+		-nc ${PARAM_NC} \
+		-tau ${PARAM_TAU} \
+		-v ${PARAM_V} \
+		-i $DATASET ) \
+		>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
+		2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	done
+	EOF
+	chmod +x execute_${type}.sh
+	done
+	./execute_host.sh
+	mkdir -p ${RESULT_DIR}/output_${NAME}/host
+	mv *.su ${RESULT_DIR}/output_${NAME}/host
+	singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singularity.sh
+	mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
+	mv *.su ${RESULT_DIR}/output_${NAME}/singularity
+	# rm execute_*.
+fi
 
 if [[ ! -z "${OPENACC}" ]]; then
 

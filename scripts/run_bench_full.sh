@@ -18,6 +18,11 @@ run_bench() {
   local nprocessors="${6}"
   local name="${bench}.${class}.${nprocs}"
 
+  if [ ! -e "\${path}\${name}" ]; then
+    echo "$name does not exists"
+    return
+    fi
+
   # nohup sar -o "${name}_native.sa" 5 > /dev/null 2>&1 &
   
   for i in `seq ${repetitions}`; do
