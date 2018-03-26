@@ -35,7 +35,7 @@ mkdir -p ${LOG_DIR}
 
 date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
-az group create --name $GROUP_NAME --location "Esat US"
+az group create --name $GROUP_NAME --location "East US"
 if [ ! $? -eq 0 ]; then
     echo "Faile to create group ${GROUP_NAME} exiting"
     exit
