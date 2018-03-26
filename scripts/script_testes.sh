@@ -13,7 +13,7 @@ IMAGE_PATH="$HOME/opencl.img" #image from nvidia's dockerhub
 # IMAGE_PATH="$HOME/ruycastilho-GPUtest-master.simg"
 ROOT_DIR="$HOME/OpenCL-seismic-processing-tiago"
 
-REPETITIONS=3
+REPETITIONS=10
 
 OPENACC=
 
