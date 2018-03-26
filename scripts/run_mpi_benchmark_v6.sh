@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $HOME/AzureTemplates
+
 # the first paramiter is the admin password, the second one is the Mout disk password the tird one is the vmSize the forth is the number of instances
  # 1=Senha123
  # 2="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
@@ -33,7 +35,7 @@ mkdir -p ${LOG_DIR}
 
 date > ${LOG_FILE}
 echo "Creating group ${GROUP_NAME}"
-az group create --name $GROUP_NAME --location "South Central US"
+az group create --name $GROUP_NAME --location "Esat US"
 if [ ! $? -eq 0 ]; then
     echo "Faile to create group ${GROUP_NAME} exiting"
     exit
