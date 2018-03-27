@@ -37,7 +37,8 @@ PARAM_C0="2e-6"
 PARAM_C1="4.4e-7"
 PARAM_NA="5"
 PARAM_NB="5"
-PARAM_NC="5"
+PARAM_NC_CMP="5"
+PARAM_NC_CRS="5"
 PARAM_APH="600"
 PARAM_APM="50"
 PARAM_TAU="0.002"
@@ -54,8 +55,8 @@ PARAM_C0="1.975e-7"
 PARAM_C1="1.384e-6"
 PARAM_NA="5"
 PARAM_NB="5"
-PARAM_NC="5"
 PARAM_NC_CMP="5"
+PARAM_NC_CRS="5"
 PARAM_APH="2600"
 PARAM_APM="50"
 PARAM_TAU="0.004"
@@ -72,7 +73,8 @@ PARAM_C0="1.98e-7"
 PARAM_C1="11.77e-6"
 PARAM_NA="5"
 PARAM_NB="5"
-PARAM_NC="5"
+PARAM_NC_CMP="5"
+PARAM_NC_CRS="5"
 PARAM_APH="600"
 PARAM_APM="50"
 PARAM_TAU="0.002"
@@ -91,7 +93,7 @@ fi
 
 echo "Executing $DATA"
 
-RESULT_DIR="${ROOT_DIR}/result_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_`date +%d-%m-%Y`"
+RESULT_DIR="${ROOT_DIR}/result_DATA-${DATA}_NA-${PARAM_NA}_NB-${PARAM_NB}_NC-CMP-${PARAM_NC_CMP}_NC-CRS-${PARAM_NC_CRS}_`date +%d-%m-%Y`"
 
 mkdir -p ${RESULT_DIR}
 
@@ -121,12 +123,12 @@ for i in \`seq 1 $REPETITIONS\`; do
 	-aph ${PARAM_APH} \
 	-c0 ${PARAM_C0} \
 	-c1 ${PARAM_C1} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CMP} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CMP}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CMP}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
@@ -141,7 +143,6 @@ mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 done
 
 
-PARAM_NC=${PARAM_NC_CMP}
 
 #CMP-OpenCL
 NAME=CMP-OpenCL
@@ -159,12 +160,12 @@ cat << EOF > execute_${type}.sh
 	-c0 ${PARAM_C0} \
 	-c1 ${PARAM_C1} \
 	-d ${PARAM_D} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CMP} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CMP}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CMP}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
@@ -176,7 +177,6 @@ singularity exec --nv -B /usr/lib/x86_64-linux-gnu/ $IMAGE_PATH ./execute_singul
 mkdir -p ${RESULT_DIR}/output_${NAME}/singularity
 mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
-
 
 
 
@@ -202,12 +202,12 @@ cat << EOF > execute_${type}.sh
 	-c1 ${PARAM_C1} \
 	-na ${PARAM_NA} \
 	-nb ${PARAM_NB} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CRS} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
@@ -245,12 +245,12 @@ cat << EOF > execute_${type}.sh
 	-c1 ${PARAM_C1} \
 	-na ${PARAM_NA} \
 	-nb ${PARAM_NB} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CRS} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
@@ -287,12 +287,12 @@ for i in \`seq 1 $REPETITIONS\`; do
 	-d ${PARAM_D} \
 	-na ${PARAM_NA} \
 	-nb ${PARAM_NB} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CRS} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
@@ -330,12 +330,12 @@ if [[ ! -z "${OPENMP}" ]]; then
 		-c1 ${PARAM_C1} \
 		-na ${PARAM_NA} \
 		-nb ${PARAM_NB} \
-		-nc ${PARAM_NC} \
+		-nc ${PARAM_NC_CRS} \
 		-tau ${PARAM_TAU} \
 		-v ${PARAM_V} \
 		-i $DATASET ) \
-		>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-		2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+		>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_output.txt" \
+		2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_time.txt"
 	done
 	EOF
 	chmod +x execute_${type}.sh
@@ -373,13 +373,13 @@ for i in \`seq 1 $REPETITIONS\`; do
 	-c1 ${PARAM_C1} \
 	-na ${PARAM_NA} \
 	-nb ${PARAM_NB} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CRS} \
 	-ngen ${PARAM_NGEN} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
@@ -417,13 +417,13 @@ for i in \`seq 1 $REPETITIONS\`; do
 	-d ${PARAM_D} \
 	-na ${PARAM_NA} \
 	-nb ${PARAM_NB} \
-	-nc ${PARAM_NC} \
+	-nc ${PARAM_NC_CRS} \
 	-ngen ${PARAM_NGEN} \
 	-tau ${PARAM_TAU} \
 	-v ${PARAM_V} \
 	-i $DATASET ) \
-	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_output.txt" \
-	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC}_time.txt"
+	>> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_output.txt" \
+	2> "${RESULT_DIR}/${NAME}_${type}_${DATA}_${PARAM_NA}_${PARAM_NB}_${PARAM_NC_CRS}_time.txt"
 done
 EOF
 chmod +x execute_${type}.sh
