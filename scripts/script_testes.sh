@@ -56,7 +56,7 @@ PARAM_C1="1.384e-6"
 PARAM_NA="5"
 PARAM_NB="5"
 PARAM_NC_CMP="5"
-PARAM_NC_CRS="5"
+PARAM_NC_CRS="101"
 PARAM_APH="2600"
 PARAM_APM="50"
 PARAM_TAU="0.004"
@@ -93,7 +93,7 @@ fi
 
 echo "Executing $DATA"
 
-RESULT_DIR="${ROOT_DIR}/result_DATA-${DATA}_NA-${PARAM_NA}_NB-${PARAM_NB}_NC-CMP-${PARAM_NC_CMP}_NC-CRS-${PARAM_NC_CRS}_`date +%d-%m-%Y`"
+RESULT_DIR="${ROOT_DIR}/result_`hostname`_DATA-${DATA}_NA-${PARAM_NA}_NB-${PARAM_NB}_NC-CMP-${PARAM_NC_CMP}_NC-CRS-${PARAM_NC_CRS}_`date +%d-%m-%Y`"
 
 mkdir -p ${RESULT_DIR}
 
@@ -437,6 +437,10 @@ mv *.su ${RESULT_DIR}/output_${NAME}/singularity
 # rm execute_*.sh
 
 cd ${ROOT_DIR}
+echo "* * * * * * * ${RESULT_DIR} * * * * * * * *"
 ls ${RESULT_DIR}
+echo "* * * * * * * ${RESULT_DIR}: * * * * * * * *"
+
+
 
 # set +x
