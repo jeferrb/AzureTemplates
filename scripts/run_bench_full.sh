@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+# set -x
 
 SMALL=
 NUMBER_REPETITIONS=${1}
@@ -48,7 +48,8 @@ run_bench() {
 }
 
 for class in A E B C D; do
-  for bench in $BENCHS; do
+  for bench in "${BENCHS[@]}"; do
+    echo "Runing ${bench} ${class} $SIZE"
     run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
   done
 done
