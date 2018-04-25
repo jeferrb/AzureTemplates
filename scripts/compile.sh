@@ -2,7 +2,7 @@
 
 SMALL=
 
-size=32
+size=64
 declare -a BENCH=(bt cg dt ep ft is lu mg sp)
 if [[ ${SMALL} ]]; then
 	declare -a CLASSES=(s)
@@ -17,11 +17,10 @@ compile_bench() {
   local nprocs="${2}"
   local class="${3}"
 
-  make -j "${bench}" NPROCS="${nprocs}" CLASS="${class}"
+  echo make -j "${bench}" NPROCS="${nprocs}" CLASS="${class}"
 }
 
 for bench in $BENCH; do
-	./compile.sh 
 	for class in $CLASSES; do
 		compile_bench "${bench}" ${size} "${class}"
 	done

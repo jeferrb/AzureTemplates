@@ -6,7 +6,7 @@ cd $HOME/AzureTemplates
  # 1=Senha123
  # 2="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
  # 3=1
- # 4=32
+ # 4=2
 set -x
 # cd $HOME/AzureTemplates
 GROUP_NAME=mpi${RANDOM}
@@ -49,6 +49,8 @@ for (( i = 0; i < $NUMBER_INSTANCES + 1 ; i++ )); do
     sleep 10
 done
 wait
+# az vm delete --resource-group $GROUP_NAME --name myVM
+
 #wait while to create the least machine
 sleep 190
 
