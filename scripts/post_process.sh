@@ -21,6 +21,16 @@ find . -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'
 
 
 # - - - - - - - - MPI - - - - - - - - - -
+rm result
+find . -type f -name "*.*.*.log" | sort -z | xargs -I % sh -c "echo % >> result ; cat % | grep 'Time in \|Running' >> result;"
+
+# Show Errors:
+grepr  "Verification " | grep -iv "Successful" | grep -v "Verification being performed"
+# grep "Verification failed"
+# - - - - - - - - Old - - - - - - - - - -
+
+find . -type f -print  -name "*.*.*.log" -exec sh -c "cat {} | grep 'Time in \|Running'" \; > result
+
 find . -type f -print  -name "*.A.*.log" -exec sh -c "cat {} | grep 'seconds\|Running'" \; > result
 
 for i in *; do

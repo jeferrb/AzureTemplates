@@ -54,6 +54,7 @@ for class in "${CLASSES[@]}"; do
     run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
   done
   # The Data Traffic benchmark (DT) requeires extra paramiters
+  # Read more at: https://github.com/sbadia/simgrid/tree/master/examples/smpi/NAS/DT
   # bench="dt"
   # echo "Runing ${bench} ${class} $SIZE"
   # run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
