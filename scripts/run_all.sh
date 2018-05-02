@@ -132,9 +132,8 @@ NUMBER_INSTANCES=2
 # -----------   Running  -------------
 
 MINWAIT=3
-MAXWAIT=20
+MAXWAIT=200
 MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
-
 
 
 AZURE_MACHINES=45
@@ -159,8 +158,7 @@ NUMBER_INSTANCES=2
 ./scripts/run_mpi_benchmark_v7.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
 
 
-
-wait
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
 
 
 AZURE_MACHINES=146
@@ -168,8 +166,9 @@ AZURE_MACHINES=146
 NUMBER_INSTANCES=1
 ./scripts/run_mpi_benchmark_v7.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
 
-sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
- 
+
+wait
+
 
 AZURE_MACHINES=116
 # cores "16"
@@ -184,8 +183,7 @@ AZURE_MACHINES=144
 NUMBER_INSTANCES=4
 ./scripts/run_mpi_benchmark_v7.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
 
-
-wait
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
 
 
 AZURE_MACHINES=108
@@ -201,7 +199,7 @@ AZURE_MACHINES=65
 NUMBER_INSTANCES=1
 ./scripts/run_mpi_benchmark_v7.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
 
-sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+wait
  
 
 AZURE_MACHINES=98
@@ -209,7 +207,7 @@ AZURE_MACHINES=98
 NUMBER_INSTANCES=4
 ./scripts/run_mpi_benchmark_v7.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a "results/run_mpi_benchmark_`date +%d-%m-%Y`_${AZURE_MACHINES}_${NUMBER_INSTANCES}.log" &
 
-wait
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
 
 
 AZURE_MACHINES=102
@@ -235,7 +233,7 @@ NUMBER_INSTANCES=2
 
 wait
 
-echo "Everything done!"
+echo "Everything done "
 
 
 # -----------   Done  -------------
