@@ -29,7 +29,7 @@ run_bench() {
   for i in `seq ${repetitions}`; do
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${name}_native.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf stat "${path}/${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
   done
@@ -37,13 +37,13 @@ run_bench() {
   # killall sar
   # nohup sar -o "${name}_singularity.sa" 5 > /dev/null 2>&1 &
 
-  for i in `seq ${repetitions}`; do
-    echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
-    date | tee -a "${name}_singularity.log"
-    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}/${name}" | tee -a "${name}_singularity.log"
-    date | tee -a "${name}_singularity.log"
-    echo | tee -a "${name}_singularity.log"
-  done
+  # for i in `seq ${repetitions}`; do
+  #   echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
+  #   date | tee -a "${name}_singularity.log"
+  #   mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile singularity exec /home/username/ubuntu.img "${path}/${name}" | tee -a "${name}_singularity.log"
+  #   date | tee -a "${name}_singularity.log"
+  #   echo | tee -a "${name}_singularity.log"
+  # done
 
   # killall sar
 }
@@ -54,22 +54,23 @@ bench=cg
   run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
 
 class=E
-for bench in "${BENCHS[@]}"; do
+bench=is
+# for bench in "${BENCHS[@]}"; do
   echo "Runing ${bench} ${class} $SIZE"
   run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
-done
-
-# for class in "${CLASSES[@]}"; do
-#   for bench in "${BENCHS[@]}"; do
-#     echo "Runing ${bench} ${class} $SIZE"
-#     run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
-#   done
-#   # The Data Traffic benchmark (DT) requeires extra paramiters
-#   # Read more at: https://github.com/sbadia/simgrid/tree/master/examples/smpi/NAS/DT
-#   # bench="dt"
-#   # echo "Runing ${bench} ${class} $SIZE"
-#   # run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
 # done
+
+for class in "${CLASSES[@]}"; do
+  for bench in "${BENCHS[@]}"; do
+    echo "Runing ${bench} ${class} $SIZE"
+    run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
+  done
+done
+# The Data Traffic benchmark (DT) requeires extra paramiters
+# Read more at: https://github.com/sbadia/simgrid/tree/master/examples/smpi/NAS/DT
+# bench="dt"
+# echo "Runing ${bench} ${class} $SIZE"
+# run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
 
 
 # if [[ ${SMALL} ]]; then
