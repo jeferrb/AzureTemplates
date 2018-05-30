@@ -21,10 +21,10 @@ NUMBER_INSTANCES=${4}
 VM_SIZE=${VM_SIZES[${3}]}
 NUMBER_RROCESSORS=${VM_CORES[${3}]}
 NUMBER_JOBS="$((${NUMBER_INSTANCES} * ${NUMBER_RROCESSORS}))"
-RESULTS_DIRECTORY="results/${VM_SIZE}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
-LOG_DIR="results/${VM_SIZE}_${NUMBER_INSTANCES}_${NUMBER_REPETITIONS}_${GROUP_NAME}"
+MOUNTPOINT=$HOME/mymountpoint/
+RESULTS_DIRECTORY="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${VM_SIZE}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
+LOG_DIR="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${VM_SIZE}_${NUMBER_INSTANCES}_${NUMBER_REPETITIONS}_${GROUP_NAME}"
 LOG_FILE="${LOG_DIR}/logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log"
-MOUNTPOINT=$HOME/mountpoint/
 
 createMachines(){
     echo "Creating the machine number $1"
@@ -91,7 +91,7 @@ for host in `seq 4 $((${NUMBER_INSTANCES}+3))`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
-scp scripts/run_bench_stat.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
+scp scripts/run_bench_stats.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
 # rm ${LOG_DIR}/hostfile
 
 ssh ${SSH_ADDR} << EOF
@@ -110,7 +110,7 @@ EOF
 
 #execute the benchmark
 ssh ${SSH_ADDR} << EOF
-    bash ./run_bench_full.sh ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS}
+    bash ./run_bench_stats.sh ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS}
 EOF
 mkdir -p ${RESULTS_DIRECTORY}
 
