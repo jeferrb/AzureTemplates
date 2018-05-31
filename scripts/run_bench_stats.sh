@@ -5,10 +5,10 @@ SMALL=
 NUMBER_REPETITIONS=${1}
 BIN_PATH=${2}
 TOTAL_CORES=${3}
-# declare -a BENCHS=(bt cg ep ft is lu mg sp)
-# declare -a CLASSES=(A B C D)
-declare -a BENCHS=(bt)
-declare -a CLASSES=(A)
+declare -a BENCHS=(bt cg ep ft is lu mg sp)
+declare -a CLASSES=(A B C D)
+# declare -a BENCHS=(bt)
+# declare -a CLASSES=(A)
 SIZE=64
 
 # run_bench(bench, class, nprocs, repetitions, path, nprocessors)
