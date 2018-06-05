@@ -21,12 +21,13 @@ find . -type f -print -iname "*.txt" -exec sh -c "cat {} | grep 'Execution Time'
 
 
 # - - - - - - - - MPI - - - - - - - - - -
+# Show Errors:
+grepr -l "Verification failed\|unable to reliably"
+
 rm result
 find . -type f -name "*.*.*.log" | sort -z | xargs -I % sh -c "echo % >> result ; cat % | grep 'Time in \|Running' >> result;"
 
-# Show Errors:
-grepr  "Verification " | grep -iv "Successful" | grep -v "Verification being performed"
-# grep "Verification failed"
+# grepr  "Verification " | grep -iv "Successful" | grep -v "Verification being performed"
 # - - - - - - - - Old - - - - - - - - - -
 
 find . -type f -print  -name "*.*.*.log" -exec sh -c "cat {} | grep 'Time in \|Running'" \; > result
