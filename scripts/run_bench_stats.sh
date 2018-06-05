@@ -32,7 +32,7 @@ run_bench() {
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf record -m 512G -o "${name}.perf.data" "${path}/${name}" | tee -a "${name}_native.log"
-    perf record mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile -o "${name}.perf.data" "${path}/${name}" | tee -a "${name}_native.log"
+    perf record -o "${name}.perf.data" mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
   done
