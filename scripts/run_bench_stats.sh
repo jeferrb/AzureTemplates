@@ -12,7 +12,7 @@ declare -a CLASSES=(A B C D)
 SIZE=64
 
 # run_bench(bench, class, nprocs, repetitions, path, nprocessors)
-run_bench() {
+run_bench_stats() {
   local bench="${1}"
   local class="${2}"
   local nprocs="${3}"
@@ -40,9 +40,46 @@ run_bench() {
   killall sar
 }
 
+
+# run_bench(bench, class, nprocs, repetitions, path)
+run_bench() {
+  local bench="${1}"
+  local class="${2}"
+  local nprocs="${3}"
+  local repetitions="${4}"
+  local path="${5}"
+  local nprocessors="${6}"
+  local name="${bench}.${class}.${nprocs}"
+  
+  for i in `seq ${repetitions}`; do
+    echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
+    date | tee -a "${name}_native.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}${name}" | tee -a "${name}_native.log"
+    date | tee -a "${name}_native.log"
+    echo | tee -a "${name}_native.log"
+  done
+  
+
+  for i in `seq ${repetitions}`; do
+    echo "Running ${name}_singularity (${i}/${repetitions})" | tee -a "${name}_singularity.log"
+    date | tee -a "${name}_singularity.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile singularity exec $HOME/ubuntu.img "${path}${name}" | tee -a "${name}_singularity.log"
+    date | tee -a "${name}_singularity.log"
+    echo | tee -a "${name}_singularity.log"
+  done
+
+}
+
+
 for class in "${CLASSES[@]}"; do
   for bench in "${BENCHS[@]}"; do
     echo "Runing ${bench} ${class} $SIZE"
-    run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
+    run_bench_stats ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
   done
 done
+
+
+class = "A"
+bench = "cg"
+echo "Runing ${bench} ${class} $SIZE"
+run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
