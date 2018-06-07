@@ -7,11 +7,12 @@ BIN_PATH=${2}
 TOTAL_CORES=${3}
 declare -a BENCHS=(bt cg ep ft is lu mg sp)
 declare -a CLASSES=(A B C D)
+declare -a FREQUENCES=(9000 2200 400 40)
 # declare -a BENCHS=(bt)
 # declare -a CLASSES=(A)
-SIZE=64
+NUM_PROC=64
 
-# run_bench(bench, class, nprocs, repetitions, path, nprocessors)
+# run_bench(bench, class, nprocs, repetitions, path, nprocessors, frequence)
 run_bench_stats() {
   local bench="${1}"
   local class="${2}"
@@ -19,6 +20,7 @@ run_bench_stats() {
   local repetitions="${4}"
   local path="${5}"
   local nprocessors="${6}"
+  local frequence="${7}"
   local name="${bench}.${class}.${nprocs}"
 
   if [ ! -e "${path}/${name}" ]; then
@@ -32,7 +34,7 @@ run_bench_stats() {
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf record -m 512G -o "${name}.perf.data" "${path}/${name}" | tee -a "${name}_native.log"
-    perf record -o "${name}.perf.data" mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${name}_native.log"
+    perf record -F ${frequence} -o "${name}.perf.data" mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
   done
@@ -43,6 +45,7 @@ run_bench_stats() {
 
 # run_bench(bench, class, nprocs, repetitions, path)
 run_bench() {
+  cp /proc/cpuinfo .
   local bench="${1}"
   local class="${2}"
   local nprocs="${3}"
@@ -71,15 +74,16 @@ run_bench() {
 }
 
 
-for class in "${CLASSES[@]}"; do
+# for class in "${CLASSES[@]}"
+for (( i=1; i<=4; i++ )); do
   for bench in "${BENCHS[@]}"; do
-    echo "Runing ${bench} ${class} $SIZE"
-    run_bench_stats ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
+    echo "Runing ${bench} ${CLASSES[$i]} $NUM_PROC"
+    run_bench_stats ${bench} "${CLASSES[$i]}" $NUM_PROC ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES} "${FREQUENCES[$i]}"
   done
 done
 
 
 class = "A"
 bench = "cg"
-echo "Runing ${bench} ${class} $SIZE"
-run_bench ${bench} "${class}" $SIZE ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
+echo "Runing ${bench} ${class} $NUM_PROC"
+run_bench ${bench} "${class}" $NUM_PROC ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}

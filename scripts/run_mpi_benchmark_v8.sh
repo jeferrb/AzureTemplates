@@ -120,6 +120,7 @@ scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
 for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
     echo "Retrieve reports from $i"
     mkdir ${RESULTS_DIRECTORY}/${i}_report
+    scp username@${i}:'cpuinfo' ${RESULTS_DIRECTORY}/${i}_report/
     scp username@${i}:'*.sa' ${RESULTS_DIRECTORY}/${i}_report/
     scp username@${i}:'*.perf.data' ${RESULTS_DIRECTORY}/${i}_report/
 done
