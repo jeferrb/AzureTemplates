@@ -91,7 +91,7 @@ for host in `seq 4 $((${NUMBER_INSTANCES}+3))`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
-scp scripts/run_bench_stats.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
+scp scripts/run_bench_stats.sh scripts/perf_record.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
 # rm ${LOG_DIR}/hostfile
 
 ssh ${SSH_ADDR} << EOF

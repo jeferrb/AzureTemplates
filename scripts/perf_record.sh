@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 frequence=$1
 name=$2
 

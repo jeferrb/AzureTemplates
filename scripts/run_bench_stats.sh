@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -x
+set -x
 
 SMALL=
 NUMBER_REPETITIONS=${1}
