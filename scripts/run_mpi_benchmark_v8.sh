@@ -94,6 +94,15 @@ done
 scp scripts/run_bench_stats.sh scripts/perf_record.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
 # rm ${LOG_DIR}/hostfile
 
+# reboot all machines
+scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
+for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
+    echo "Rebooting $i"
+    ssh "username@${i}" sudo reboot
+done
+
+delay 90
+
 ssh ${SSH_ADDR} << EOF
     set -x
     # Add all nodes to known hosts and copy the private key to all machines
