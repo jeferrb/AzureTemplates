@@ -101,7 +101,7 @@ for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
     ssh "username@${i}" sudo reboot
 done
 
-delay 90
+sleep 90
 
 ssh ${SSH_ADDR} << EOF
     set -x
