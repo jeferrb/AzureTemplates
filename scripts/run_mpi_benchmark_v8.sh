@@ -98,7 +98,9 @@ scp scripts/run_bench_stats.sh scripts/perf_record.sh ${LOG_DIR}/hostfile ${SSH_
 scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
 for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
     echo "Rebooting $i"
-    ssh "username@${i}" sudo reboot
+    ssh "username@${i}" << EOF
+        sudo reboot now
+EOF
 done
 
 sleep 90
