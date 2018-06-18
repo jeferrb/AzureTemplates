@@ -52,7 +52,7 @@ wait
 # az vm delete --resource-group $GROUP_NAME --name myVM
 
 #wait while to create the least machine
-sleep 190
+sleep 280
 
 echo "******************************************"  >> ${LOG_FILE}
 
@@ -94,16 +94,16 @@ done
 scp scripts/run_bench_stats.sh scripts/perf_record.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
 # rm ${LOG_DIR}/hostfile
 
-# reboot all machines
-scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
-for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
-    echo "Rebooting $i"
-    ssh "username@${i}" << EOF
-        sudo reboot now
-EOF
-done
+# # reboot all machines
+# scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
+# for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
+#     echo "Rebooting $i"
+#     ssh "username@${i}" << EOF
+#         sudo reboot now
+# EOF
+# done
 
-sleep 90
+# sleep 90
 
 ssh ${SSH_ADDR} << EOF
     set -x

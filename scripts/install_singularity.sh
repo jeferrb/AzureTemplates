@@ -62,6 +62,9 @@ wait
 
 echo "done" > /home/username/donefile.txt
 
+
+sudo reboot now
+
 # cp /home/username/mymountpoint/ubuntu.img /home/username/
 
 # singularity pull shub://ruycastilho/GPUtest:1604
