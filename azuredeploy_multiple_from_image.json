@@ -404,7 +404,7 @@
         },
         "storageProfile": {
             "imageReference": {
-                "id": "/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/image-perf-resiliency"
+                "id": "/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image"
             },
             "osDisk": {
                 "createOption": "fromImage",
