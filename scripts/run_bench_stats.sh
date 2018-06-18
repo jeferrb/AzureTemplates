@@ -74,6 +74,8 @@ run_bench() {
 }
 
 
+
+
 # for class in "${CLASSES[@]}"
 for (( i=1; i<=4; i++ )); do
   for bench in "${BENCHS[@]}"; do
