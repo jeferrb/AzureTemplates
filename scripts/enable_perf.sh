@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# https://unix.stackexchange.com/a/14256
+# https://unix.stackexchange.com/a/14256 <-- solves the problem
+# https://stackoverflow.com/q/44584439/5918489 <-- no need to modify it
 
 
 sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
