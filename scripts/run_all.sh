@@ -29,6 +29,8 @@ MINWAIT=3
 MAXWAIT=200
 MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
 
+mkdir results
+
 
 AZURE_MACHINES=98
 # cores "16"
