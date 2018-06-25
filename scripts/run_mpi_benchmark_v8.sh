@@ -91,8 +91,9 @@ for host in `seq 4 $((${NUMBER_INSTANCES}+3))`; do
     echo "10.0.0.${host} slots=${NUMBER_RROCESSORS}" >> ${LOG_DIR}/hostfile
 done
 
-scp scripts/run_bench_stats.sh scripts/perf_record.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
-# rm ${LOG_DIR}/hostfile
+scp scripts/run_bench_stats.sh ${SSH_ADDR}:
+scp scripts/perf_record.sh ${SSH_ADDR}:
+scp ${LOG_DIR}/hostfile ${SSH_ADDR}:
 
 # # reboot all machines
 # scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
@@ -112,6 +113,8 @@ ssh ${SSH_ADDR} << EOF
     for host in \`seq 4 $((${NUMBER_INSTANCES}+3))\`; do
         ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
         scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
+    # Copy the execution script to all machines
+        scp run_bench_stats.sh perf_record.sh "10.0.0.\${host}":
     done
     # Copy known host that contains all machines to all machines
     for host in \`seq 4 $((${NUMBER_INSTANCES}+3))\`; do
