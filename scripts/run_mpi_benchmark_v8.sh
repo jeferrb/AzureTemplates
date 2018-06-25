@@ -52,7 +52,7 @@ wait
 # az vm delete --resource-group $GROUP_NAME --name myVM
 
 # wait while after creating the least machine
-sleep 30
+sleep 5
 
 echo "******************************************"  >> ${LOG_FILE}
 
