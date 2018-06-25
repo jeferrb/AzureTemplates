@@ -77,7 +77,8 @@ run_bench() {
 
 
 # for class in "${CLASSES[@]}"
-for (( i=1; i<=4; i++ )); do
+# Bash starts from ZERO
+for (( i=0; i<=1; i++ )); do
   for bench in "${BENCHS[@]}"; do
     echo "Runing ${bench} ${CLASSES[$i]} $NUM_PROC"
     run_bench_stats ${bench} "${CLASSES[$i]}" $NUM_PROC ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES} "${FREQUENCES[$i]}"
