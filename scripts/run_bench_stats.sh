@@ -6,7 +6,7 @@ NUMBER_REPETITIONS=${1}
 BIN_PATH=${2}
 TOTAL_CORES=${3}
 declare -a BENCHS=(bt cg ep ft is lu mg sp)
-declare -a CLASSES=(A) #B C D)
+declare -a CLASSES=(A B C D)
 declare -a FREQUENCES=(9000 2200 400 40)
 # declare -a BENCHS=(bt)
 # declare -a CLASSES=(A)
@@ -86,7 +86,6 @@ for (( thisClass=0; thisClass<=4; thisClass++ )); do
 done
 
 
-class = "A"
-bench = "cg"
-echo "Runing ${bench} ${class} $NUM_PROC"
-run_bench ${bench} "${class}" $NUM_PROC ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
+
+echo "Runing cg A $NUM_PROC"
+run_bench cg A $NUM_PROC ${NUMBER_REPETITIONS} ${BIN_PATH} ${TOTAL_CORES}
