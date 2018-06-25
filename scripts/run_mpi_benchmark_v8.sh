@@ -147,6 +147,8 @@ for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
     # scp username@${i}:'' ${RESULTS_DIRECTORY}/${i}_report/
 done
 
+wait
+
 # if [ -d "$MOUNTPOINT" ]; then
 #     cp -r ${RESULTS_DIRECTORY} "$MOUNTPOINT/"
 # fi
