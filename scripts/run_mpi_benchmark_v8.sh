@@ -34,11 +34,13 @@ createMachines(){
 }
 
 retriveResult(){
-    echo "Retrieve reports from $1"
+    echo "Retrieve reports from $1 to ${RESULTS_DIRECTORY}/${i}_report"
     ssh ${1} << EOF
-    mkdir ${RESULTS_DIRECTORY}/${1}_report
-    cp *.sa *.perf.data ${RESULTS_DIRECTORY}/${1}_report/
+    set +x
+    mkdir -p ${RESULTS_DIRECTORY}/${1}_report
+    cp *.perf.data ${RESULTS_DIRECTORY}/${1}_report/
 EOF
+    # cp *.sa *.perf.data ${RESULTS_DIRECTORY}/${1}_report/
 }
 
 mkdir -p ${LOG_DIR}
