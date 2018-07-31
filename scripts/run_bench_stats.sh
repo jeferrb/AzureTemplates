@@ -34,7 +34,7 @@ run_bench_stats() {
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf record -m 512G -o "${name}.perf.data" "${path}/${name}" | tee -a "${name}_native.log"
-    mpirun -np "${nprocs}" --hostfile hostfile perf_record.sh ${frequence} "${path}/${name}" | tee -a "${name}_native.log"
+    time mpirun -np "${nprocs}" --hostfile hostfile perf_record.sh ${frequence} "${path}/${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
     killall sar

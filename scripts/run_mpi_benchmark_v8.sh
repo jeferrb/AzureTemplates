@@ -29,7 +29,7 @@ LOG_FILE="${LOG_DIR}/logfile_${VM_SIZE}_${NUMBER_INSTANCES}_${GROUP_NAME}.log"
 createMachines(){
     echo "Creating the machine number $1"
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" --resource-group $GROUP_NAME \
-    --template-file azuredeploy_multiple_from_image.json --parameters vmSize="${VM_SIZE}" vmName="testMpi${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
+    --template-file azuredeploy_multiple_from_image.json --parameters vmSize="${VM_SIZE}" vmName="testMPI${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
     adminPassword=$2 scriptParameterPassMount=$3 adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
 }
 

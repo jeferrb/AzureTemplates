@@ -48,3 +48,80 @@ for i in *; do
                 find $i -type f -print  -name "*.output" -exec sh -c "cat {} | grep 'Time\|Done:'" \; > result_${i}.txt
         fi
 done
+
+
+# - - - - - - - - perf - - - - - - - - - -
+
+declare -a BENCHS=(bt cg ep ft is lu mg sp)
+declare -a CLASSES=(A B C D)
+mkdir results_txt
+for i in results/*; do
+	local result=`echo $i | rev | cut -d'/' -f1 | cut -c 24- | rev`
+	for class in "${CLASSES[@]}"; do
+		for bench in "${BENCHS[@]}"; do
+			echo ${result}.${bench}.${class}.txt
+			find $i -name "${bench}.${class}*.perf.data" -exec sh -c "perf script -i {} 2>/dev/null" \; | awk '{print $7}' | sort | uniq -c | sort -rn >> results_txt/${result}.${bench}.${class}.txt &
+		done
+		wait
+	done
+done
+
+# find is.D.64 -name "*.perf.data" -exec sh -c "perf script -i {} 2>/dev/null" \; | awk '{print $7}' | sort | uniq -c | sort -n
+
+# - - - - - - -
+
+
+
+for i in *.txt; do
+	if [[ -s $i ]]; then
+		echo "${i//\./,}" | rev | cut -c 5- | rev > ${i}.filter
+		echo ",occurrences,function" >> ${i}.filter
+		grep -v "unknown" $i | head -n 150 | sed 's/^/ /' | sed -r 's/[ ]+/,/g' >> ${i}.filter
+		for lines in $(seq $(cat ${i}.filter | wc -l) 152); do
+			echo ",," >> ${i}.filter
+		done
+	else
+		echo "File $i has no samples"
+	fi
+done
+
+for bench in "${BENCHS[@]}"; do
+	paste -d, *.${bench}.*.filter > concat.${bench}.csv
+done
+paste -d, *.filter > concat.csv
+
+=SUM(A$3:A$155)
+=100*B3/SUM(B$3:B$152)
+QUERY(perf_report!1:155,"Select A, B, C where C contains 'binvcrhs'")
+QUERY(perf_report!1:155,"Select * where A contains '"&$A5&"'")
+
+
+
+# for i in *.filter; do
+# 	sed -i '$!s/$/,/' ${i}
+# 	sed -r 's/[ ]+/,/g'
+# done
+
+
+# declare -a BENCHS=(bt cg ep ft is lu mg sp)
+# declare -a CLASSES=(A B C D)
+# all_files=""
+# for machine in `ls *.filter | cut -d "." -f 1 | sort | uniq`; do
+# 	for bench in "${BENCHS[@]}"; do
+# 		for class in "${CLASSES[@]}"; do
+# 			echo ${machine}.${bench}.${class}.txt.filter
+# 			all_files+="${machine}.${bench}.${class}.txt.filter "
+# 		done
+# 	done
+# done
+
+# paste -d, $all_files > concat.csv
+
+# for i in `seq 1 150`; do
+# 	for file in "*.filter"; do
+# 		echo -n "$i: "
+# 		sed '${i}q;d' ${file}
+# 	done
+# done > all_results.txt
+
+
