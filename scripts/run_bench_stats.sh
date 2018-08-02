@@ -30,11 +30,21 @@ run_bench_stats() {
 
   
   for i in `seq ${repetitions}`; do
+    nohup sar -o "${name}_perf_native_rep-${i}.sa" 5 > /dev/null 2>&1 &
+    echo "Running ${name}_perf_native (${i}/${repetitions})" | tee -a "${name}_perf_native.log"
+    date | tee -a "${name}_perf_native.log"
+    # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf record -m 512G -o "${name}.perf.data" "${path}/${name}" | tee -a "${name}_perf_native.log"
+    (time mpirun -np "${nprocs}" --hostfile hostfile perf_record.sh ${frequence} "${path}/${name}") 2>&1 | tee -a "${name}_perf_native.log"
+    date | tee -a "${name}_perf_native.log"
+    echo | tee -a "${name}_perf_native.log"
+    killall sar
+  done
+
+  for i in `seq ${repetitions}`; do
     nohup sar -o "${name}_native_rep-${i}.sa" 5 > /dev/null 2>&1 &
     echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
-    # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf record -m 512G -o "${name}.perf.data" "${path}/${name}" | tee -a "${name}_native.log"
-    time mpirun -np "${nprocs}" --hostfile hostfile perf_record.sh ${frequence} "${path}/${name}" | tee -a "${name}_native.log"
+    mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${name}_native.log"
     date | tee -a "${name}_native.log"
     echo | tee -a "${name}_native.log"
     killall sar
