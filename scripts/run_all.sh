@@ -212,3 +212,94 @@ sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
 
 
 # -----------   Done  -------------
+
+
+
+108
+144
+45
+55
+98
+
+55	"Standard_D32_v3",
+108	"Standard_E64_v3"
+144	"Standard_F16s_v2"
+
+#  ________________________
+
+
+
+AZURE_MACHINES=108
+# cores "64"
+NUMBER_INSTANCES=1
+MOUNTPOINT=$HOME/mymountpoint/
+RESULTS_DIRECTORY="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${AZURE_MACHINES}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
+mkdir -p ${RESULTS_DIRECTORY}
+./scripts/run_mpi_benchmark_v8.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a ${RESULTS_DIRECTORY}.log.txt &
+
+
+MINWAIT=300
+MAXWAIT=500
+MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+ 
+
+AZURE_MACHINES=55
+# cores "32"
+NUMBER_INSTANCES=2
+MOUNTPOINT=$HOME/mymountpoint/
+RESULTS_DIRECTORY="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${AZURE_MACHINES}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
+mkdir -p ${RESULTS_DIRECTORY}
+./scripts/run_mpi_benchmark_v8.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a ${RESULTS_DIRECTORY}.log.txt &
+
+
+MINWAIT=200
+MAXWAIT=500
+MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+
+
+wait 
+
+
+AZURE_MACHINES=144
+# cores "16"
+NUMBER_INSTANCES=4
+MOUNTPOINT=$HOME/mymountpoint/
+RESULTS_DIRECTORY="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${AZURE_MACHINES}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
+mkdir -p ${RESULTS_DIRECTORY}
+./scripts/run_mpi_benchmark_v8.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a ${RESULTS_DIRECTORY}.log.txt &
+
+
+
+MINWAIT=3
+MAXWAIT=200
+MAXWAIT=`echo "$MAXWAIT-$MINWAIT" | bc`
+sleep $(((RANDOM % $MAXWAIT)+$MINWAIT))
+ 
+
+
+AZURE_MACHINES=98
+# cores "16"
+NUMBER_INSTANCES=4
+MOUNTPOINT=$HOME/mymountpoint/
+RESULTS_DIRECTORY="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${AZURE_MACHINES}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
+mkdir -p ${RESULTS_DIRECTORY}
+./scripts/run_mpi_benchmark_v8.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a ${RESULTS_DIRECTORY}.log.txt &
+
+
+wait
+
+
+
+AZURE_MACHINES=45
+# cores "16"
+NUMBER_INSTANCES=4
+MOUNTPOINT=$HOME/mymountpoint/
+RESULTS_DIRECTORY="$MOUNTPOINT/results_$(date +%d-%m-%Y)/${AZURE_MACHINES}_instances_${NUMBER_INSTANCES}_date_$(date +%d-%m-%Y)_result"
+mkdir -p ${RESULTS_DIRECTORY}
+./scripts/run_mpi_benchmark_v8.sh "pass${RANDOM}lala" gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg== ${AZURE_MACHINES} ${NUMBER_INSTANCES} 2>&1 | tee -a ${RESULTS_DIRECTORY}.log.txt &
+
+
+wait
+ 

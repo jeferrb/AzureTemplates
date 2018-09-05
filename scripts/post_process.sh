@@ -24,11 +24,6 @@ cat times.txt | paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # > ../${ls results | grep Standard | head -n1 | rev | cut -d '_' -n -f4- | rev}.times.csv
 
-for i in *result.log.txt; do
-	cat ${i} | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | sed "s/m/*60+/g" | sed "s/*60+g/mg/g" | \
-	paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | \
-	awk '{print $1  "\t=" $192 "\t=" $193 "\t=" $194 "\t=" $195 "\t=" $196 "\t"}' | sed "s/s\t/ /g"  > ${i}.times.csv
-done
 
 
 # Extract the name of the machine
@@ -36,10 +31,42 @@ head -n 11 ${i} | tail -n 1 | rev | cut -d "=" -f 1 | rev
 # Extract the day of the experiment
 head -n 17 ${i} | tail -n 1 | rev | cut -d"_" -f 2 | rev
 
-for file in *.csv; do
-	echo "`head -n 11 ${i} | tail -n 1 | rev | cut -d "=" -f 1 | rev`\t`head -n 17 ${i} | tail -n 1 | rev | cut -d"_" -f 2 | rev`"$'\n'"$(cat -- "$file")" > "$file"
+
+# get all times from the last execution in the format: bench_name, real, user, sys (from the last process to be executed), real, user, sys (from mpirun)
+for i in *result.log.txt; do
+	echo "`head -n 11 ${i} | tail -n 1 | rev | cut -d "=" -f 1 | rev`-`head -n 17 ${i} | tail -n 1 | rev | cut -d"_" -f 2 | rev`\treal (1 proc)\tuser (1 proc)\tsys (1 proc)\treal (mpirun)\tuser (mpirun)\tsys (mpirun)" > "${i}.times.csv"
+	cat ${i} | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | tail -n6272 | sed "s/m/*60+/g" | sed "s/*60+g/mg/g" | \
+	paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | \
+	awk '{print $1  "\t=" $191 "\t=" $192 "\t=" $193 "\t=" $194 "\t=" $195 "\t=" $196 "\t"}' | sed "s/s\t/\t/g" | sed "s/_native//g" | sort >> ${i}.times.csv
 done
 
+# the same as above but printing all coluns
+for i in *result.log.txt; do
+	echo "`head -n 11 ${i} | tail -n 1 | rev | cut -d "=" -f 1 | rev`-`head -n 17 ${i} | tail -n 1 | rev | cut -d"_" -f 2 | rev`\treal (1 proc)\tuser (1 proc)\tsys (1 proc)\treal (mpirun)\tuser (mpirun)\tsys (mpirun)" > "${i}.times.csv"
+	cat ${i} | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | tail -n6272 | sed "s/m/*60+/g" | sed "s/*60+g/mg/g" | \
+	paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | \
+	sed "s/ /\t=/g" | sed "s/s\t/\t/g" | sed "s/s$//g" | sed "s/_native//g" | sort >> ${i}.times.csv
+done
+
+
+# the same as above but printing just real
+for i in *result.log.txt; do
+	echo "`head -n 11 ${i} | tail -n 1 | rev | cut -d "=" -f 1 | rev`-`head -n 17 ${i} | tail -n 1 | rev | cut -d"_" -f 2 | rev`\treal (1 proc)\treal (mpirun)" > "${i}.times.csv"
+	cat ${i} | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | tail -n6272 | sed "s/m/*60+/g" | sed "s/*60+g/mg/g" | \
+	paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | \
+	sed "s/ /\t=/g" | sed "s/s\t/\t/g" | sed "s/s$//g" | sed "s/_native//g" | sort | awk '{printf "%s\t", $1; for(i=2;i<=NF;i+=3)printf "%s\t",$i;printf "\n"}' >> ${i}.times.csv
+done
+
+
+# the same as above but printing just max, min and average of real time ------ Never gonna work need to calculate the formula
+# for i in *result.log.txt; do
+# 	echo "`head -n 11 ${i} | tail -n 1 | rev | cut -d "=" -f 1 | rev`-`head -n 17 ${i} | tail -n 1 | rev | cut -d"_" -f 2 | rev`\treal max (1 proc)\treal min (1 proc)\treal avg (1 proc)\treal\treal (mpirun)" > "${i}.times.csv"
+# 	cat ${i} | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | tail -n6272 | sed "s/m/*60+/g" | sed "s/*60+g/mg/g" | \
+# 	paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | \
+# 	sed "s/ /\t=/g" | sed "s/s\t/\t/g" | sed "s/s$//g" | sed "s/_native//g" | sort | awk  '{printf "%s\t", $1; max=$2; min=$2;  for(i=2;i<=NF-3;i+=3){if ($i > max) max=$i; if ($i < min) min=$i; total += $i; count++} ; printf "%s\t%s\t%s\t%s\t\n", max, min, total/count, ${NF-2}' >> ${i}.times.csv
+# done
+
+# awk '{ total += $1; count++ } END { print total/count ; print total}'
 # - - - - - - - - MPI - - - - - - - - - -
 # Show Errors:
 # grepr -l "Verification failed\|unable to reliably"
@@ -97,6 +124,8 @@ done
 # - - - - - - -
 
 
+find . -name "mympi*" | xargs du -sh
+
 
 for i in *.txt; do
 	if [[ -s $i ]]; then
@@ -118,17 +147,24 @@ done
 paste -d, *.filter > concat.csv
 
 
-for class in "${CLASSES[@]}"; do
-	for bench in "${BENCHS[@]}"; do
+for bench in "${BENCHS[@]}"; do
+	for class in "${CLASSES[@]}"; do
 		file="${bench}.${class}.all"
 		for i in mympi*/${bench}.${class}*; do
 			perf script -i $i 2> /dev/null | wc -l
 		done | sort >  ${file}
-		head -n 1 ${file}; tail -n 1 ${file} ; awk '{ total += $1; count++ } END { print total/count ; print total}' ${file}
+		echo "${bench} ${class}"
+		# head -n 1 ${file}; tail -n 1 ${file} ; awk '{ total += $1; count++ } END { print total/count ; print total}' ${file}
+		# tail -n 32 ${file} | head -n1
 	done
-done
+done > median.all
 
-
+for bench in "${BENCHS[@]}"; do
+	for class in "${CLASSES[@]}"; do
+		file="${bench}.${class}.all"
+		tail -n 32 ${file} | head -n1
+	done
+done > median.all
 
 =SUM(A$3:A$1002)
 =100*B3/SUM(B$3:B$1002)
