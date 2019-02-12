@@ -67,6 +67,9 @@ done
 # done
 
 # awk '{ total += $1; count++ } END { print total/count ; print total}'
+
+
+
 # - - - - - - - - MPI - - - - - - - - - -
 # Show Errors:
 # grepr -l "Verification failed\|unable to reliably"
@@ -199,5 +202,35 @@ QUERY(perf_report!1:155,"Select * where A contains '"&$A5&"'")
 # 		sed '${i}q;d' ${file}
 # 	done
 # done > all_results.txt
+
+
+# - - - - - - - - Canários - - - - - - - - - -
+
+# remover perf.data, criando uma nova pasta
+find results_2*-01-2019 -type d > dirs.txt
+mkdir results_jan_2019_lite
+cd results_jan_2019_lite
+xargs mkdir -p < ../dirs.txt
+cd ../
+find results_2*-01-2019 -type f -not -name "*.perf.data" -exec echo cp {} results_jan_2019_lite/{} \; > copy.sh
+sh copy.sh
+
+
+
+# Process the time between iterations (single infra configuration)
+for i in *_native.log; do; cat $i | grep "TIME" | grep -v "Starting" | awk '{print $2}' > ${i}.csv ; done
+
+echo *64_native.log.csv | sed 's/ /\t/g' > result.csv
+paste *64_native.log.csv | head -n 500 >> result.csv
+
+
+# Process the time between iterations (multiple results)
+	for i in ${j}/*64_native.log; do
+		cat $i | grep "TIME" | grep -v "Starting" | awk '{print $2}' > ${i}.csv
+	done
+for j in Standard_*-01-2019_result; do
+	echo ${j}/*64_native.log.csv | sed 's/ /,/g' > result_concat/${j}.csv
+	paste -d ',' ${j}/*64_native.log.csv >> result_concat/${j}.csv
+done
 
 

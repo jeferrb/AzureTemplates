@@ -222,11 +222,11 @@ for i in results/*/perf_data/execution_*; do
 			for (( time = 1; time < 10; time++)); do
 				samples=$((${FREQUENCES[$thisClass]} * ${time} * 30)) # increase every 30 seconds
 				samples=${samples/\./}
-				echo ${i}/${bench}.${CLASSES[$thisClass]}.64.${samples}.txt
+				echo ${i}/${bench}.${CLASSES[$thisClass]}.64.${samples}samples.txt
 				for process in ${i}/${bench}.${CLASSES[$thisClass]}.64-*.perf.data; do
 					perf script -i $process 2> /dev/null | head -n $samples | awk '{print $7}'
 					# echo 1
-				done | sort | uniq -c | sort -n | tail -n 10 > ${i}/${bench}.${CLASSES[$thisClass]}.64.${samples}.txt &
+				done | sort | uniq -c | sort -n | tail -n 10 > ${i}/${bench}.${CLASSES[$thisClass]}.64.${samples}samples.txt &
 			done
 			wait
 		done
@@ -243,19 +243,101 @@ for i in results/*/perf_data/execution_*; do
 done
 
 
-declare -a LETTERS=(' ' A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
-flag=1
-for i in `seq 1 27`; do
-	for j in `seq $flag 27`; do
-		for k in `seq 2 27`; do
-			echo "$i $j $k - ${LETTERS[$i]}${LETTERS[$j]}${LETTERS[$k]}"
-			if [[ $i -eq 2 ]] && [[ $j -eq 15 ]] && [[ $k -eq 17 ]]; then
-				echo "lslslsls"
-				break;
-			fi
+function myFunc {
+	declare -a LETTERS=(' ' A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
+	flag=1
+	for i in `seq 1 27`; do
+		for j in `seq $flag 27`; do
+			for k in `seq 2 27`; do
+				echo "${LETTERS[$i]}${LETTERS[$j]}${LETTERS[$k]}"
+				if [[ $i -eq 2 ]] && [[ $j -eq 15 ]] && [[ $k -eq 17 ]]; then
+					return
+				fi
+			done
 		done
+		flag=2
 	done
-	flag=2
-done | less
+}
+
+
+# Post-process on progress
+for i in results_txt/*.txt; do
+	if [[ -s $i ]]; then
+		echo "${i//\./,}" | rev | cut -c 5- | cut -d "/" -f1 | rev | tee ${i}.filter
+		echo ",occurrences,function" >> ${i}.filter
+		# grep -v "unknown" $i | head -n 150 | sed 's/^/ /' | sed -r 's/[ ]+/,/g' >> ${i}.filter
+		head -n 1000 $i | sed 's/^/ /' | sed -r 's/[ ]+/,/g' >> ${i}.filter
+		for lines in $(seq $(cat ${i}.filter | wc -l) 1002); do
+			echo ",," >> ${i}.filter
+		done
+	else
+		echo "File $i has no samples"
+	fi
+done
+
+vals=($(myFunc))
+
+for i in `seq 1 ${#vals[@]}`; do
+	echo ${vals[$i]}
+done
+
+
+
+
+#  Perf analysis
+samplesPerMinute=$((40 * 60)) # increase every 60 seconds
+samplesPerMinute=${samplesPerMinute/\./}
+
+# grab all the fist 5 minuts of execution to text files
+for process in results/*/perf_data/execution_*/*.D.64-*.perf.data; do
+	echo processing $process
+	perf script -i $process 2> /dev/null | head -n $((${samplesPerMinute} * 5)) > ${process}.5min.txt
+	# rm ${process}.10min.txt
+done
+
+# declare -a BENCHS=(bt)
+declare -a BENCHS=(bt cg ep ft is lu mg sp)
+for i in results/*/perf_data/execution_*; do
+	for bench in "${BENCHS[@]}"; do
+		for (( minutes = 1; minutes < 6; minutes++ )); do
+			lastSample=$((${samplesPerMinute} * minutes))
+			echo ${i}/${bench}.D.64.${lastSample}samples.txt
+			echo "$i ${bench}.D.64.${lastSample}samples" | sed "s/\// /g" | awk '{print $2 "," $5}' > ${i}/${bench}.D.64.${minutes}min.csv
+			echo "$i ${bench}.D.64.${samplesPerMinute}samples" | sed "s/\// /g" | awk '{print $2 "," $5}' > ${i}/${bench}.D.64.1min${minutes}.csv
+			for process in ${i}/${bench}.D.64-*.perf.data.5min.txt; do
+				cat ${process} | head -n $lastSample | awk '{print $7}'
+				# ls ${process}
+			done | sort | uniq -c | sort -rn | awk '{print $2","$1}' >> ${i}/${bench}.D.64.${minutes}min.csv &
+			for process in ${i}/${bench}.D.64-*.perf.data.5min.txt; do
+				cat ${process} | head -n $lastSample | tail -n ${samplesPerMinute} | awk '{print $7}'
+				# ls ${process}
+			done | sort | uniq -c | sort -rn | awk '{print $2","$1}' >> ${i}/${bench}.D.64.1min${minutes}.csv &
+		done
+		wait
+	done
+done
+
+max_line=`wc -l results/*/perf_data/execution_*/*.D.64.*min*.csv | sort -n | tail -n2 | head -n1 | awk '{print $1}'`
+for i in results/*/perf_data/execution_*/*.D.64.*min*.csv; do
+	echo ${i}
+	for lines in $(seq `wc -l ${i} | awk '{print $1}'` $max_line); do
+		echo "," >> ${i}
+	done
+done
+
+ulimit -Hn 10240 # The hard limit
+ulimit -Sn 10240 # The soft limit
+paste -d ',' results/*/perf_data/execution_*/*.D.64.*min.csv > results_txt/all_benchs.D.64.sun_minutes.csv
+paste -d ',' results/*/perf_data/execution_*/*.D.64.*min?.csv > results_txt/all_benchs.D.64.1_minute.csv
+
+
+# head -n $lastSample | awk '{print $7}' | sort | uniq -c | sort -n -r | awk '{print $2","$1}' > tmp; paste -d, tbl.csv tmp > a.csv; mv a.csv tbl.csv
+
+
+
+
+
+
+# for i in 10000 20000 30000 40000 50000; do ; done
 
 
