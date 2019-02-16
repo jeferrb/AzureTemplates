@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 import pandas as pd
 import glob, os
-import json
+import json, math
 
 colors=['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0','#f032e6','#bcf60c','#fabebe','#008080',
 		'#e6beff','#9a6324','#fffac8','#800000','#aaffc3','#808000','#ffd8b1','#000075','#808080','#ffffff']
 my_dpi=600
 fisrt_samples=500
+first_seconds=120
 f = plt.figure(dpi=my_dpi)
 # plt.ylim(0, 15000000)
 
@@ -32,7 +33,10 @@ npb_classes=['A','B','C','D']
 npb_benchs= ['bt', 'cg', 'ep', 'ft', 'is', 'lu', 'mg', 'sp']
 df['mean_500'] = float('nan')
 df['mean_general'] = float('nan')
+df['mean_%s_sec'%first_seconds] = float('nan')
 
+# def calculate_time_s (row):
+# 	return row/0.0005
 
 # for npb_bench in npb_benchs:
 # 	df.loc[(df.loc[:,'execution'] == npb_execution) &
@@ -51,15 +55,15 @@ df['mean_general'] = float('nan')
 for index, file2 in enumerate(sorted(glob.glob('execution_*/*.csv'))):
 	print('Handling %s...' % file2)
 	df3 = pd.read_csv(file2).T
-	print('Processing experiment:')
-	for x in range(0,31): # iterate over all lines
+	print('Processing experiments...')
+	for x in range(0,32): # iterate over all lines
 		# Get the index that split machine name
 		k = df3.index[x].rfind('/')
 		# Get the 'name of experiment'_native.log.csv
 		experiment=df3.index[x][k+1:]
 		# Remove '_native.log.csv'
 		experiment=experiment[:len(experiment)-15]
-		print (experiment)
+		# print (experiment)
 		# Remove date from setup (fist part of the string)
 		setup_full=df3.index[x][:k-23]
 		# 'k-7' Include the date but removes '_result'
@@ -71,15 +75,22 @@ for index, file2 in enumerate(sorted(glob.glob('execution_*/*.csv'))):
 		# Setup = just the name of machine
 		setup='_'.join(setup_full.split('_', inst_name_sz)[:inst_name_sz])
 		npb_execution=int(setup_full[-1])
-		for npb_bench in npb_benchs:
-			for npb_class in npb_classes:
-				df.loc[(df.loc[:,'execution'] == npb_execution) &
-					(df.loc[:,'class'] == npb_class) &
-					(df.loc[:,'instance'] == setup) &
-					(df.loc[:,'bench'] == npb_bench), 'mean_500']= (df3.iloc[x,:fisrt_samples].mean())
-				df.loc[(df.loc[:,'execution'] == npb_execution) &
-					(df.loc[:,'class'] == npb_class) &
-					(df.loc[:,'instance'] == setup) &
-					(df.loc[:,'bench'] == npb_bench), 'mean_general']= (df3.iloc[x,:].mean())
+		(npb_bench, npb_class, npb_jobs) = experiment.split('.',3)
+		# for npb_bench in npb_benchs:
+		# 	for npb_class in npb_classes:
+		df.loc[(df.loc[:,'execution'] == npb_execution) &
+			(df.loc[:,'class'] == npb_class) &
+			(df.loc[:,'instance'] == setup) &
+			(df.loc[:,'bench'] == npb_bench), 'mean_500']= (df3.iloc[x,:fisrt_samples].mean())
+		df.loc[(df.loc[:,'execution'] == npb_execution) &
+			(df.loc[:,'class'] == npb_class) &
+			(df.loc[:,'instance'] == setup) &
+			(df.loc[:,'bench'] == npb_bench), 'mean_general']= (df3.iloc[x,:].mean())
+		df.loc[(df.loc[:,'execution'] == npb_execution) &
+			(df.loc[:,'class'] == npb_class) &
+			(df.loc[:,'instance'] == setup) &
+			(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec'%first_seconds]= (df3.iloc[x,:math.floor((1000000*first_seconds)/df3.iloc[x,:].mean())].mean())
 
+# (df.iloc[543,12]*500)/1000000
+df['time_500_sec'] = df.apply(lambda row: row.mean_500*0.0005, axis=1)
 df.to_csv('time_nas_mean.csv')

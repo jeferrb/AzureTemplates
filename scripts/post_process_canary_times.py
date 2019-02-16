@@ -39,7 +39,8 @@ for npb_bench in npb_benchs:
 	# fig, (ax1, ax2) = plt.subplots()
 	# df2.plot(kind='bar',x=0,y=5)
 	plt.barh(df2['instance'], df2['run1'], align='center', color=colors)
-	# this ---->>> plt.plot(df2['mean_general']/100, df2['instance'], 'D')
+	# this ---->>> 
+	plt.plot(df2['mean_general']/(df2['mean_general'].iloc[0]/df2['run1'].iloc[0]), df2['instance'], 'D')
 	# this ---->>> plt.show()
 	# plt.scatter(df2['instance'], df2['run1'], color='r', marker='^')
 	# plt.plot(df2['instance'], df2['run1'], 'o')

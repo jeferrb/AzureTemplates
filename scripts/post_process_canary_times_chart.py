@@ -9,6 +9,7 @@ colors=['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0','#
 		'#e6beff','#9a6324','#fffac8','#800000','#aaffc3','#808000','#ffd8b1','#000075','#808080','#ffffff']
 my_dpi=600
 fisrt_samples=500
+first_seconds=120
 f = plt.figure(dpi=my_dpi)
 # plt.ylim(0, 15000000)
 
@@ -28,7 +29,7 @@ df = pd.read_csv(file)
 npb_execution=1
 npb_class='D'
 npb_benchs= ['bt', 'cg', 'ep', 'ft', 'is', 'lu', 'mg', 'sp']
-labels=['Average (fisrt %s)' % fisrt_samples,'Average (all samples)', 'NPB reported time']
+labels=['Average (fisrt %s)' % fisrt_samples,'Average (fisrt %s seconds)' % first_seconds,'Average (all samples)', 'NPB reported time']
 
 for npb_bench in npb_benchs:
 	print ('Handling ', npb_bench)
@@ -38,6 +39,7 @@ for npb_bench in npb_benchs:
 	plt.title('%s.%s.%d'%(npb_bench,npb_class,64))
 	fig, ax1 = plt.subplots()
 	ax1.plot(df2['instance'], df2['mean_%s' % fisrt_samples], 'rs', color='b', label=labels[1])
+	ax1.plot(df2['instance'], df2['mean_%s_sec'%first_seconds], 'rP', color='c', label=labels[0])
 	ax1.plot(df2['instance'], df2['mean_general'], 'r^', color='g', label=labels[0])
 	ax1.set_xlabel('Instance')
 	fig.autofmt_xdate()
@@ -52,10 +54,11 @@ for npb_bench in npb_benchs:
 
 	# Create custom legend
 	leg1 = mpatches.Patch(color='b')
-	leg2 = mpatches.Patch(color='g')
-	leg3 = mpatches.Patch(color='r')
+	leg2 = mpatches.Patch(color='c')
+	leg3 = mpatches.Patch(color='g')
+	leg4 = mpatches.Patch(color='r')
 	# fig.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-	fig.legend(handles=[leg1, leg2, leg3], labels=labels, loc="center left", bbox_to_anchor=(1, 0.5))
+	fig.legend(handles=[leg1, leg2, leg3, leg4], labels=labels, loc="center left", bbox_to_anchor=(1, 0.5))
 
 	fig.tight_layout()
 	fig.savefig('charts_times_compare/%s-%s-%d.png'%(npb_bench,npb_class,64), bbox_inches='tight', dpi=my_dpi)
