@@ -28,7 +28,7 @@ experiments = [[16],
 # [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]]
 
 now = datetime.datetime.now()
-group_name = now.strftime("mygroup2-%d-%m-%Y")
+group_name = now.strftime("mygroup-%d-%m-%Y")
 script_name = os.path.realpath('./run_mpi_benchmark_v9.sh')
 base_cmd = 'bash ' + script_name + ' ' + group_name
 azure_machines = 116 # Standard_F16s
@@ -39,8 +39,10 @@ for experiment in experiments:
 	# Create more instances?
 	if (current_created_instances < number_instances):
 		cmd = base_cmd + ' create ' + str(azure_machines) + ' ' + str(number_instances - current_created_instances)
+		print('*************   *************   *************   *************   *************')
 		print(cmd)
-		subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		print('*************   *************   *************   *************   *************')
+		# subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 		current_created_instances = number_instances
 	# Compose a hostfile patern and trigger experiments
 	hostfile = collections.Counter(experiment)
@@ -49,14 +51,18 @@ for experiment in experiments:
 		key = slot
 		value = hostfile[key]
 		slots+= ' ' + str(value) + ' ' + str(key)
-	cmd = base_cmd + ' execute ' + number_process + ' ' + slots
+	cmd = base_cmd + ' execute ' + str(number_process) + ' ' + slots
+	print('*************   *************   *************   *************   *************')
 	print(cmd)
+	print('*************   *************   *************   *************   *************')
 	subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 
 # Retrieve results ans destroy cloud infrastructure
 cmd = base_cmd + ' destroy'
+print('*************   *************   *************   *************   *************')
 print(cmd)
-subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+print('*************   *************   *************   *************   *************')
+# subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 
 # azure_machines =98
 # number_instances =4

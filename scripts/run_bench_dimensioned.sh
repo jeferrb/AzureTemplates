@@ -40,7 +40,8 @@ for i in `seq ${repetitions}`; do
 }
 
 for binary in $BIN_PATH/*.${NUMBER_JOBS} ; do
-  bench=${binary:0:2}
-  class=${binary:3:1}
+  binfile=${binary##*/}
+  bench=${binfile:0:2}
+  class=${binfile:3:1}
   run_bench $bench $class $NUMBER_JOBS $NUMBER_REPETITIONS $BIN_PATH
 done

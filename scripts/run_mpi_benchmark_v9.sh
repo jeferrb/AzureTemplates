@@ -24,7 +24,7 @@ declare -a VM_SIZES=("Basic_A0" "Basic_A1" "Basic_A2" "Basic_A3" "Basic_A4" "Sta
 declare -a VM_CORES=("1" "1" "2" "4" "8" "1" "1" "1" "8" "16" "2" "2" "2" "4" "8" "4" "4" "2" "4" "8" "8" "8" "8" "16" "1" "1" "2" "2" "4" "8" "1" "1" "2" "2" "2" "4" "4" "4" "8" "8" "8" "16" "16" "16" "20" "16" "16" "2" "2" "2" "2" "2" "4" "4" "4" "32" "32" "8" "8" "8" "4" "4" "16" "16" "64" "64" "8" "8" "1" "1" "2" "2" "2" "4" "4" "4" "8" "8" "8" "8" "8" "16" "16" "16" "16" "16" "20" "2" "2" "2" "4" "4" "4" "8" "8" "8" "16" "16" "16" "16" "2" "2" "32" "32" "32" "32" "4" "4" "64" "64" "64" "64" "8" "8" "1" "16" "16" "1" "2" "2" "4" "4" "8" "8" "16" "16" "16" "16" "8" "8" "12" "12" "24" "24" "24" "24" "6" "6" "12" "24" "6" "2" "4" "8" "16" "32" "64" "72")
 
 
-MOUNTPOINT=$HOME/mymountpoint/
+MOUNTPOINT=$HOME/mymountpoint
 RESULTS_DIRECTORY="$MOUNTPOINT/results_${GROUP_NAME}/result"
 LOG_FILE="${RESULTS_DIRECTORY}/logfile_${GROUP_NAME}.log"
 PASSWORD="pass${RANDOM}lala"
@@ -97,19 +97,19 @@ EOF
         fi
 
         # If there is no coordinator key, create one
-        if [ ! -f ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub ]; then
+        if [ ! -f ${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub ]; then
             # Create an id RSA for the coordenator
             ssh ${SSH_ADDR} << EOF
                 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 EOF
             # retrieve coordinator (master) credential
-            scp ${SSH_ADDR}:.ssh/id_rsa.pub ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub
+            scp ${SSH_ADDR}:.ssh/id_rsa.pub ${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
         fi
 
         # copy coordinator (master) credential to all slaves
         for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
             echo "Put ssh key on $i"
-            ssh-copy-id -f -i ${LOG_DIR}/id_rsa_coodinator_${GROUP_NAME}.pub "username@${i}"
+            ssh-copy-id -f -i ${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub "username@${i}"
         done
 
     ;;
@@ -123,19 +123,19 @@ EOF
         
 
         # create a custom hostfile to divide the jobs along machines
-        rm -f ${LOG_DIR}/hostfile
+        rm -f ${RESULTS_DIRECTORY}/hostfile
         host=4 # starts with 4, the fisrt IP of subnet
         num_machines_arg=4 # the number of machines is the fourth (sixth, eighth, ...) argument
         while [[ -n "${!num_machines_arg}" ]]; do
             num_slots_arg=$((num_machines_arg+1))
             for (( i = 0; i < "${!num_machines_arg}"; i++ )); do
-                echo "10.0.0.${host} slots=${!num_slots_arg}" >> ${LOG_DIR}/hostfile
+                echo "10.0.0.${host} slots=${!num_slots_arg}" >> ${RESULTS_DIRECTORY}/hostfile
                 host=$((host+1))
             done
             num_machines_arg=$((num_machines_arg+2))
         done
 
-        NUMBER_INSTANCES2=`wc -l ${LOG_DIR}/hostfile | awk '{print $1}'`
+        NUMBER_INSTANCES2=`wc -l ${RESULTS_DIRECTORY}/hostfile | awk '{print $1}'`
         
         if [[ NUMBER_INSTANCES2 -gt NUMBER_INSTANCES ]]; then
             echo "Number of requested slots ($NUMBER_INSTANCES2) are greater than created instances ($NUMBER_INSTANCES)"
@@ -147,7 +147,7 @@ EOF
         SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 
         # Push the scripts and hostfile to coordinator
-        scp scripts/run_bench_dimensioned.sh ${LOG_DIR}/hostfile ${SSH_ADDR}:
+        scp scripts/run_bench_dimensioned.sh ${RESULTS_DIRECTORY}/hostfile ${SSH_ADDR}:
 
         ssh ${SSH_ADDR} << EOF
             set -x
