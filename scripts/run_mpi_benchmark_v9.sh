@@ -44,13 +44,8 @@ createMachines(){
     adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
 }
 
-retrieveResult(){
-    echo "Retrieve reports from $1 to ${RESULTS_DIRECTORY}/${i}_report"
-    ssh ${1} << EOF
-    set +x
-    mkdir -p ${RESULTS_DIRECTORY}/${1}_report
-    cp *.perf.data ${RESULTS_DIRECTORY}/${1}_report/
-EOF
+retrieveResults(){
+    scp "${1}:/home/username/*.log" ${RESULTS_DIRECTORY}
 }
 
 # The second argument determines script action
@@ -167,18 +162,15 @@ EOF
 
         # Effectively execute the benchmark
         ssh ${SSH_ADDR} << EOF
-            bash ./run_bench_dimensioned.sh ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS}
+            bash ./run_bench_dimensioned.sh ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
 EOF
-        mkdir -p ${RESULTS_DIRECTORY}
 
     ;;
     'destroy')
         echo "Let's retrieve de data and ${2} the $GROUP_NAME group"
-        scp "${SSH_ADDR}:/home/username/*.log" ${RESULTS_DIRECTORY}
-
-        # retrieve all stats
+        # retrieve stats
         for ssh_addr in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
-            retrieveResult $ssh_addr &
+            retrieveResults $ssh_addr &
         done
         wait
 

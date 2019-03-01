@@ -12,20 +12,19 @@ import collections, subprocess, os, datetime
 '''
 
 experiments = [[16],
-[12, 13]]
-# ,
-# [16, 16],
-# [12, 12, 12],
-# [12, 12, 12, 13],
-# [16, 16, 16, 16],
-# [13, 13, 13, 14, 14, 14],
-# [14, 14, 14, 14, 14, 15, 15],
-# [15, 15, 15, 15, 15, 15, 15, 16],
-# [15, 15, 15, 15, 16, 16, 16, 16],
-# [16, 16, 16, 16, 16, 16, 16, 16],
-# [15, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16],
-# [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
-# [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]]
+[12, 13],
+[16, 16],
+[12, 12, 12],
+[12, 12, 12, 13],
+[16, 16, 16, 16],
+[13, 13, 13, 14, 14, 14],
+[14, 14, 14, 14, 14, 15, 15],
+[15, 15, 15, 15, 15, 15, 15, 16],
+[15, 15, 15, 15, 16, 16, 16, 16],
+[16, 16, 16, 16, 16, 16, 16, 16],
+[15, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16],
+[16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+[16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]]
 
 now = datetime.datetime.now()
 group_name = now.strftime("mygroup-%d-%m-%Y")
@@ -42,7 +41,7 @@ for experiment in experiments:
 		print('*************   *************   *************   *************   *************')
 		print(cmd)
 		print('*************   *************   *************   *************   *************')
-		# subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 		current_created_instances = number_instances
 	# Compose a hostfile patern and trigger experiments
 	hostfile = collections.Counter(experiment)
@@ -62,7 +61,7 @@ cmd = base_cmd + ' destroy'
 print('*************   *************   *************   *************   *************')
 print(cmd)
 print('*************   *************   *************   *************   *************')
-# subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 
 # azure_machines =98
 # number_instances =4
