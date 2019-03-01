@@ -44,8 +44,11 @@ createMachines(){
     adminPublicKey="`cat ~/.ssh/id_rsa.pub`" >> ${LOG_FILE}
 }
 
-retrieveResults(){
-    scp "${1}:/home/username/*.log" ${RESULTS_DIRECTORY}
+retrieveResults(){ # It is not needed anymore
+    for ssh_addr in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
+        scp "${ssh_addr}:/home/username/*.log" ${RESULTS_DIRECTORY} &
+    done
+    wait
 }
 
 # The second argument determines script action
@@ -167,13 +170,7 @@ EOF
 
     ;;
     'destroy')
-        echo "Let's retrieve de data and ${2} the $GROUP_NAME group"
-        # retrieve stats
-        for ssh_addr in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
-            retrieveResults $ssh_addr &
-        done
-        wait
-
+        echo "Let's ${2} the $GROUP_NAME group"
         az group delete --yes --no-wait --resource-group ${GROUP_NAME}
     ;;
 esac
