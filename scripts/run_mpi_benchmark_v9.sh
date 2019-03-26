@@ -29,6 +29,8 @@ RESULTS_DIRECTORY="$MOUNTPOINT/results_${GROUP_NAME}/result"
 LOG_FILE="${RESULTS_DIRECTORY}/logfile_${GROUP_NAME}.log"
 PASSWORD="pass${RANDOM}lala"
 DISK_PASSWORD="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
+COORDINATOR_KEY=${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
+NUMBER_CREATION_ATTEMPTS=10
 
 mkdir -p ${RESULTS_DIRECTORY}
 
@@ -55,8 +57,9 @@ retrieveResults(){ # It is not needed anymore
 case ${2} in
     'create')
         VM_SIZE=${VM_SIZES[${3}]}
-        NUMBER_INSTANCES=${4}
-        echo "Let's ${2} $NUMBER_INSTANCES $VM_SIZE at $GROUP_NAME group"
+        NUMBER_EXPECTED_INSTANCES=${4}
+        NUMBER_INITIAL_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
+        echo "Let's ${2} $NUMBER_EXPECTED_INSTANCES $VM_SIZE at $GROUP_NAME group"
         if [ ! -f ${LOG_FILE} ]; then
             echo "This group does not exists yeat, let's create it now"
             date > ${LOG_FILE}
@@ -67,12 +70,22 @@ case ${2} in
                 exit
             fi
         fi
+
+        remaining_creation_attempts=$NUMBER_CREATION_ATTEMPTS
         current_machines=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
-        for (( machine_number = current_machines; machine_number < $((current_machines + NUMBER_INSTANCES)) ; machine_number++ )); do
-            createMachines $machine_number ${VM_SIZE} &
-            sleep 10
+        while [[ $current_machines -ne $((NUMBER_EXPECTED_INSTANCES+NUMBER_INITIAL_INSTANCES)) && remaining_creation_attempts -gt 0 ]]; do
+            for (( machine_number = current_machines; machine_number < $((current_machines + NUMBER_EXPECTED_INSTANCES)) ; machine_number++ )); do
+                createMachines $machine_number ${VM_SIZE} &
+                sleep 10
+            done
+            wait
+            current_machines=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
+            remaining_creation_attempts=$((remaining_creation_attempts-1))
+            echo NUMBER_EXPECTED_INSTANCES $NUMBER_EXPECTED_INSTANCES
+            echo current_machines $current_machines
+            echo remaining_creation_attempts $remaining_creation_attempts
         done
-        wait
+
         # wait while to create the least machine
         sleep 5
 
@@ -87,27 +100,27 @@ case ${2} in
 EOF
         done
 
-        # Get coordinator address (the least one)
-        SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+        # Get coordinator address (the first one)
+        SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
         if [[ -z "${SSH_ADDR}" ]]; then
             echo "Faile to create a VM instace, reverting changes"
             az group delete --resource-group ${GROUP_NAME} --yes --no-wait
         fi
 
         # If there is no coordinator key, create one
-        if [ ! -f ${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub ]; then
+        if [ ! -f $COORDINATOR_KEY ]; then
             # Create an id RSA for the coordenator
             ssh ${SSH_ADDR} << EOF
                 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 EOF
             # retrieve coordinator (master) credential
-            scp ${SSH_ADDR}:.ssh/id_rsa.pub ${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
+            scp ${SSH_ADDR}:.ssh/id_rsa.pub $COORDINATOR_KEY
         fi
 
         # copy coordinator (master) credential to all slaves
         for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
             echo "Put ssh key on $i"
-            ssh-copy-id -f -i ${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub "username@${i}"
+            ssh-copy-id -f -i $COORDINATOR_KEY "username@${i}"
         done
 
     ;;
@@ -117,7 +130,7 @@ EOF
 
         NUMBER_JOBS="${3}"
         echo "Let's ${2} $NUMBER_JOBS jobs at $GROUP_NAME group"
-        NUMBER_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
+        NUMBER_CURRENT_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
         
 
         # create a custom hostfile to divide the jobs along machines
@@ -133,16 +146,16 @@ EOF
             num_machines_arg=$((num_machines_arg+2))
         done
 
-        NUMBER_INSTANCES2=`wc -l ${RESULTS_DIRECTORY}/hostfile | awk '{print $1}'`
-        
-        if [[ NUMBER_INSTANCES2 -gt NUMBER_INSTANCES ]]; then
-            echo "Number of requested slots ($NUMBER_INSTANCES2) are greater than created instances ($NUMBER_INSTANCES)"
+        NUMBER_EXPECTED_INSTANCES=`wc -l ${RESULTS_DIRECTORY}/hostfile | awk '{print $1}'`
+
+        if [[ NUMBER_EXPECTED_INSTANCES -gt NUMBER_CURRENT_INSTANCES ]]; then
+            echo "Number of requested slots ($NUMBER_EXPECTED_INSTANCES) are greater than created instances ($NUMBER_CURRENT_INSTANCES)"
             echo "Exiting..."
             exit
         fi
 
-        # Get coordinator address (the least one)
-        SSH_ADDR=`grep "ssh " ${LOG_FILE} | tail -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+        # Get coordinator address (the first one)
+        SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 
         # Push the scripts and hostfile to coordinator
         scp scripts/run_bench_dimensioned.sh ${RESULTS_DIRECTORY}/hostfile ${SSH_ADDR}:
@@ -151,14 +164,14 @@ EOF
             set -x
             # Add all nodes to known hosts and copy the private key to all machines
             rm ~/.ssh/known_hosts
-            for host in \`seq 4 $((${NUMBER_INSTANCES}+3))\`; do
+            for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
             # Copy the execution script to all machines
                 scp *.sh "10.0.0.\${host}":
             done
             # Copy known host that contains all machines to all machines
-            for host in \`seq 4 $((${NUMBER_INSTANCES}+3))\`; do
+            for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 scp .ssh/known_hosts "10.0.0.\${host}":.ssh
             done
 EOF

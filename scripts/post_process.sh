@@ -78,7 +78,8 @@ find . -type f -name "*.*.*.log" -exec grep -l "Verification failed\|unable to r
 rm result
 find . -type f -name "*.*.*.log" | sort -z | xargs -I % sh -c "echo % >> result ; cat % | grep 'Time in \|Running' >> result;"
 
-find . -type f -print  -name "*.*.*.log" -exec sh -c "cat {} | grep 'Time in seconds'" \; | grep -B1 'Time in seconds' | grep -v "\-\-" > time_nas.txt
+# find . -type f -print  -name "*.*.*.log" -exec sh -c "cat {} | grep 'Time in seconds'" \; | grep -B1 'Time in seconds' | grep -v "\-\-" > time_nas.txt
+find . -type f -print  -name "*.*.*.log" -exec sh -c "grep 'Time in seconds' {}" \; | grep -B1 'Time in seconds' | grep -v "\-\-" | sed 's/Time in seconds = //' | awk '{print $1}' | paste - - - - | sed 's/\.\///' | sed 's/_native\.log//' > time_nas.txt
 
 # grepr  "Verification " | grep -iv "Successful" | grep -v "Verification being performed"
 # - - - - - - - - Old - - - - - - - - - -

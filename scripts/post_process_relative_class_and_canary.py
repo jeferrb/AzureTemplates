@@ -1,30 +1,29 @@
 #!/bin/python3
 # libraries
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import rc
 import pandas as pd
 import glob, os
 import json, math
 
-colors=['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0','#f032e6','#bcf60c','#fabebe','#008080',
-		'#e6beff','#9a6324','#fffac8','#800000','#aaffc3','#808000','#ffd8b1','#000075','#808080','#ffffff']
-my_dpi=600
 first_samples=500
 first_seconds=60
-f = plt.figure(dpi=my_dpi)
+
+
+# import matplotlib.pyplot as plt
+# from matplotlib import rc
+# colors=['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0','#f032e6','#bcf60c','#fabebe','#008080',
+# 		'#e6beff','#9a6324','#fffac8','#800000','#aaffc3','#808000','#ffd8b1','#000075','#808080','#ffffff']
+# my_dpi=600
+# f = plt.figure(dpi=my_dpi)
 # plt.ylim(0, 15000000)
-
-font = {'family' : 'sans-serif',
-		'size'   : 10}
-
-rc('font', **font)
-
-plt.clf()
+# font = {'family' : 'sans-serif',
+# 		'size'   : 10}
+# rc('font', **font)
+# plt.clf()
 # plt.ylim(bottom=0)
+
 file='time_nas.csv'
 # file='time_nas_mean_plus.csv'
-
 print('Handling %s' % file)
 df = pd.read_csv(file)
 
@@ -33,13 +32,6 @@ npb_classes=['A','B','C','D']
 npb_benchs= ['bt', 'cg', 'ep', 'ft', 'is', 'lu', 'mg', 'sp']
 azure_setup = ['Standard_D16_v3', 'Standard_D32_v3', 'Standard_D64_v3', 'Standard_D64s_v3', 'Standard_E16_v3', 'Standard_E32_v3',
 				'Standard_E64_v3', 'Standard_F16s', 'Standard_F16s_v2', 'Standard_F32s_v2', 'Standard_F64s_v2']
-# df['mean_500'] = float('nan')
-# df['mean_general'] = float('nan')
-# df['mean_%s_sec'%first_seconds] = float('nan')
-
-# def calculate_time_s (row):
-# 	return row/0.0005
-
 
 
 def from_csv_to_tex(csv_file_name, table_header, table_caption):
@@ -57,7 +49,7 @@ def from_csv_to_tex(csv_file_name, table_header, table_caption):
 	f_csv.readline() # discard first line
 	line = f_csv.readline()
 	while line:
-		new_line='\\hline\n' + line.replace('Standard_', '').replace('_', '\\_')
+		new_line='\\hline\n' + line.replace('Standard_', '').replace('_', '\\_').upper()
 		f_tex.write(new_line[:len(new_line)-1] + ' \\\\\n')
 		line = f_csv.readline()
 	f_tex.write('\\hline\n')
@@ -65,7 +57,6 @@ def from_csv_to_tex(csv_file_name, table_header, table_caption):
 	f_tex.write('\\end{table}\n')
 	f_csv.close()
 	f_tex.close()
-
 
 
 first_samples_reference=[]
@@ -93,9 +84,10 @@ for index, file2 in enumerate(sorted(glob.glob('execution_*/*.csv'))):
 		inst_name_sz= (3 if setup_full.split('_', 3)[2] != 'instances' else 2)
 		# Setup = just the name of machine
 		setup = '_'.join(setup_full.split('_', inst_name_sz)[:inst_name_sz])
+		print('%.2f per cent'%float(x/0.32))
 		npb_execution=int(setup_full[-1])
 		(npb_bench, npb_class, npb_jobs) = experiment.split('.',3)
-		if (index==0): # if this is the reference machine
+		if (index==0): # if this is the reference machine, calculate the number of saples 
 			first_samples_reference.append(math.floor((1000000*first_seconds)/df3.iloc[x,:].mean()))
 		# for npb_bench in npb_benchs:
 		# 	for npb_class in npb_classes:
@@ -112,6 +104,17 @@ for index, file2 in enumerate(sorted(glob.glob('execution_*/*.csv'))):
 				(df.loc[:,'class'] == npb_class) &
 				(df.loc[:,'instance'] == setup) &
 				(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec'%(first_seconds*y)]= (df3.iloc[x,:(first_samples_reference[x]*y)].mean())
+		samples = 0;
+		sum_time_samples = 0;
+		for seconds in range(1,60):
+			while (sum_time_samples < (1000000 * seconds) and ( not math.isnan(df3.iloc[x,samples]) ) and len(df3.iloc[x,:]) > samples ):
+				sum_time_samples+=df3.iloc[x,samples]
+				samples+=1;
+			# print("samples %d, sum_time_samples %d, len %d"%(samples, sum_time_samples, len(df3.iloc[x,:])))
+			df.loc[(df.loc[:,'execution'] == npb_execution) &
+				(df.loc[:,'class'] == npb_class) &
+				(df.loc[:,'instance'] == setup) &
+				(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec'%(seconds)]= df3.iloc[x,:samples].mean()
 
 # Calculate how long time was spent to execute the first 500 samples 
 # (df.iloc[543,12]*500)/1000000
@@ -191,6 +194,17 @@ for npb_bench in npb_benchs:
 					(df.loc[:,'instance'] == setup) &
 					(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_price'%(first_seconds*y)] = float(
 						(current_time * float(current_price.iloc[:,1]) * float(current_price.iloc[:,2]))/60)
+			# Based on partial executions 2
+			for y in range(1,59):
+				current_time = df.loc[(df.loc[:,'execution'] == npb_execution) &
+						(df.loc[:,'class'] == npb_class) &
+						(df.loc[:,'instance'] == setup) &
+						(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec'%(y)]
+				df.loc[(df.loc[:,'execution'] == npb_execution) &
+					(df.loc[:,'class'] == npb_class) &
+					(df.loc[:,'instance'] == setup) &
+					(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_price'%(y)] = float(
+						(current_time * float(current_price.iloc[:,1]) * float(current_price.iloc[:,2]))/60)
 
 # df = pd.read_csv('time_nas_mean_plus.csv')
 
@@ -249,6 +263,31 @@ for npb_bench in npb_benchs:
 					(df.loc[:,'class'] == npb_class) &
 					(df.loc[:,'instance'] == setup) &
 					(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_normalized_price'%(first_seconds*y)] = float(current_price/min_price)
+# Normilize fisrt Y seconds
+		for y in range(1,59):
+			min_time = df.loc[(df.loc[:,'execution'] == npb_execution) &
+						(df.loc[:,'class'] == npb_class) &
+						(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec'%(y)].min()
+			min_price = df.loc[(df.loc[:,'execution'] == npb_execution) &
+						(df.loc[:,'class'] == npb_class) &
+						(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_price'%(y)].min()
+			for setup in azure_setup:
+				current_time = df.loc[(df.loc[:,'execution'] == npb_execution) &
+						(df.loc[:,'class'] == npb_class) &
+						(df.loc[:,'instance'] == setup) &
+						(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec'%(y)]
+				current_price = df.loc[(df.loc[:,'execution'] == npb_execution) &
+						(df.loc[:,'class'] == npb_class) &
+						(df.loc[:,'instance'] == setup) &
+						(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_price'%(y)]
+				df.loc[(df.loc[:,'execution'] == npb_execution) &
+					(df.loc[:,'class'] == npb_class) &
+					(df.loc[:,'instance'] == setup) &
+					(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_normalized'%(y)] = float(current_time/min_time)
+				df.loc[(df.loc[:,'execution'] == npb_execution) &
+					(df.loc[:,'class'] == npb_class) &
+					(df.loc[:,'instance'] == setup) &
+					(df.loc[:,'bench'] == npb_bench), 'mean_%s_sec_normalized_price'%(y)] = float(current_price/min_price)
 # Normilize based on NAS reported time and price
 		for run in range(1,4):
 			min_time = df.loc[(df.loc[:,'execution'] == npb_execution) &
@@ -275,20 +314,28 @@ for npb_bench in npb_benchs:
 					(df.loc[:,'instance'] == setup) &
 					(df.loc[:,'bench'] == npb_bench), 'run_%s_normalized_price'%(run)] = float(current_price/min_price)
 
-
+df.to_csv('preprocessed.csv')
+# exit()
+# df = pd.read_csv('preprocessed.csv')
 
 # build classifications
 npb_execution=1
 run=1
 npb_class_D='D'
-my_dfs=[]
-table_header='Instance&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Class \\\\ D}&\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (2 min.)}&\\makecell{Mean \\\\ (5 min.)}&\\makecell{Mean \\\\ (10 min.)} \\\\\n'
+# table_header='Instance&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Class \\\\ D}&\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (2 min.)}&\\makecell{Mean \\\\ (5 min.)}&\\makecell{Mean \\\\ (10 min.)} \\\\\n'
+table_header='Instance&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Class \\\\ D}&\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 seg.)}&\\makecell{Mean \\\\ (5 seg.)}&\\makecell{Mean \\\\ (10 seg.)} \\\\\n'
+						# 'mean_60_sec_normalized', 'mean_120_sec_normalized', 'mean_300_sec_normalized', 'mean_600_sec_normalized']
 for npb_bench in npb_benchs:
 	df2 = df.loc[(df.loc[:,'execution'] == npb_execution) &
 			(df.loc[:,'class'] == npb_class_D) &
 			(df.loc[:,'bench'] == npb_bench),['instance', 'run_%s_normalized'%(run), 'mean_general_normalized',
-						'mean_60_sec_normalized', 'mean_120_sec_normalized', 'mean_300_sec_normalized', 'mean_600_sec_normalized']
+						'mean_1_sec_normalized', 'mean_2_sec_normalized', 'mean_5_sec_normalized', 'mean_10_sec_normalized']
 								].rename(index=str, columns={'run_%s_normalized'%(run): 'run_%s_%s_classified'%(run, npb_class_D)})
+	df22 = df.loc[(df.loc[:,'execution'] == npb_execution) &
+			(df.loc[:,'class'] == npb_class_D) &
+			(df.loc[:,'bench'] == npb_bench),['instance', 'run_%s_normalized_price'%(run), 'mean_general_normalized_price',
+						'mean_1_sec_normalized_price', 'mean_2_sec_normalized_price', 'mean_5_sec_normalized_price', 'mean_10_sec_normalized_price']
+								].rename(index=str, columns={'run_%s_normalized_price'%(run): 'run_%s_%s_classified_price'%(run, npb_class_D)})
 	for npb_class in npb_classes[:3]:
 		df4 = df.loc[(df.loc[:,'execution'] == npb_execution) &
 				(df.loc[:,'class'] == npb_class) &
@@ -296,10 +343,19 @@ for npb_bench in npb_benchs:
 				].rename(index=str, columns={'run_%s_normalized'%(run): 'run_%s_%s_classified'%(run, npb_class)})
 		df4.index=df2.index
 		df2 = df2.join(df4)
-	df2.iloc[:,[0, 7, 8, 9, 1, 2, 3, 4, 5, 6]].round(2).to_csv('tables/classifications_%s_time.csv'%npb_bench, sep='&', index=False)
-	table_caption='%s benchmark normalized on different comparison methods'%npb_bench.upper()
+		df44 = df.loc[(df.loc[:,'execution'] == npb_execution) &
+				(df.loc[:,'class'] == npb_class) &
+				(df.loc[:,'bench'] == npb_bench),['run_%s_normalized_price'%(run)]
+				].rename(index=str, columns={'run_%s_normalized_price'%(run): 'run_%s_%s_classified_price'%(run, npb_class)})
+		df44.index=df22.index
+		df22 = df22.join(df4)
+	df2.iloc[:,[0, 7, 8, 9, 1, 2, 3, 5, 6]].round(2).to_csv('tables/classifications_%s_time.csv'%npb_bench, sep='&', index=False)
+	table_caption='%s benchmark execution time normalized on different comparison methods'%npb_bench.upper()
 	from_csv_to_tex('tables/classifications_%s_time.csv'%npb_bench, table_header, table_caption)
-	
+	df22.iloc[:,[0, 7, 8, 9, 1, 2, 3, 5, 6]].round(2).to_csv('tables/classifications_%s_price.csv'%npb_bench, sep='&', index=False)
+	table_caption='%s benchmark execution price normalized on different comparison methods'%npb_bench.upper()
+	from_csv_to_tex('tables/classifications_%s_price.csv'%npb_bench, table_header, table_caption)
+
 
 
 # # build classifications price based
@@ -351,17 +407,23 @@ for npb_bench in npb_benchs:
 			(df.loc[:,'class'] == npb_class_D) &
 			(df.loc[:,'bench'] == npb_bench),['mean_general_normalized']].idxmin())
 	df5.loc[(df5.loc[:,'bench'] == npb_bench), 'selecting_all_means'] = float(df.iloc[idx_min_all_means].loc['mean_general_normalized'])
-	for y in [1, 5]:
+	for y in [1, 5, 10]:
 		idx_min_all_means = int(df.loc[(df.loc[:,'execution'] == npb_execution) &
 				(df.loc[:,'class'] == npb_class_D) &
-				(df.loc[:,'bench'] == npb_bench),['mean_%s_sec_normalized'%(first_seconds*y)]].idxmin())
-		df5.loc[(df5.loc[:,'bench'] == npb_bench), 'selecting_%s_sec_means'%(first_seconds*y)] = float(df.iloc[idx_min_all_means].loc['mean_%s_sec_normalized'%(first_seconds*y)])
+				(df.loc[:,'bench'] == npb_bench),['mean_%s_sec_normalized'%(y)]].idxmin())
+		df5.loc[(df5.loc[:,'bench'] == npb_bench), 'selecting_%s_sec_means'%(y)] = float(df.iloc[idx_min_all_means].loc['mean_%s_sec_normalized'%(y)])
 
 df5.round(2).to_csv('tables/classifications_methods_time.csv', sep='&', index=False)
-table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (5 min.)}\\\\\n'
-table_caption='Classifications based on different approaches'
+# table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (5 min.)}\\\\\n'
+table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 sec.)}&\\makecell{Mean \\\\ (5 sec.)}&\\makecell{Mean \\\\ (10 sec.)}\\\\\n'
+table_caption='Time based overhead using different approaches'
 from_csv_to_tex('tables/classifications_methods_time.csv', table_header, table_caption)
 
+df5.iloc[:,[0, 1, 2, 3]].round(2).to_csv('tables/classifications_methods_time_a_b_c.csv', sep='&', index=False)
+# table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (5 min.)}\\\\\n'
+table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C}\\\\\n'
+table_caption='Time based overhead using different approaches'
+from_csv_to_tex('tables/classifications_methods_time_a_b_c.csv', table_header, table_caption)
 
 
 # Thid Table
@@ -379,17 +441,23 @@ for npb_bench in npb_benchs:
 			(df.loc[:,'class'] == npb_class_D) &
 			(df.loc[:,'bench'] == npb_bench),['mean_general_normalized_price']].idxmin())
 	df6.loc[(df6.loc[:,'bench'] == npb_bench), 'selecting_all_means'] = float(df.iloc[idx_min_all_means].loc['mean_general_normalized_price'])
-	for y in [1, 5]:
+	for y in [1, 5, 10]:
 		idx_min_all_means = int(df.loc[(df.loc[:,'execution'] == npb_execution) &
 				(df.loc[:,'class'] == npb_class_D) &
-				(df.loc[:,'bench'] == npb_bench),['mean_%s_sec_normalized_price'%(first_seconds*y)]].idxmin())
-		df6.loc[(df6.loc[:,'bench'] == npb_bench), 'selecting_%s_sec_means'%(first_seconds*y)] = float(df.iloc[idx_min_all_means].loc['mean_%s_sec_normalized_price'%(first_seconds*y)])
+				(df.loc[:,'bench'] == npb_bench),['mean_%s_sec_normalized_price'%(y)]].idxmin())
+		df6.loc[(df6.loc[:,'bench'] == npb_bench), 'selecting_%s_sec_means'%(y)] = float(df.iloc[idx_min_all_means].loc['mean_%s_sec_normalized_price'%(y)])
 
 df6.round(2).to_csv('tables/classifications_methods_price.csv', sep='&', index=False)
-table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (5 min.)}\\\\\n'
-table_caption='Classifications based on different approaches'
+# table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (5 min.)}\\\\\n'
+table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 sec.)}&\\makecell{Mean \\\\ (5 sec.)}&\\makecell{Mean \\\\ (10 sec.)}\\\\\n'
+table_caption='Price based overhead using different approaches'
 from_csv_to_tex('tables/classifications_methods_price.csv', table_header, table_caption)
 
+df6.iloc[:,[0, 1, 2, 3]].round(2).to_csv('tables/classifications_methods_price_a_b_c.csv', sep='&', index=False)
+# table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C} &\\makecell{Mean \\\\ (general)}&\\makecell{Mean \\\\ (1 min.)}&\\makecell{Mean \\\\ (5 min.)}\\\\\n'
+table_header='Benchmark&\\makecell{Class \\\\ A} &\\makecell{Class \\\\ B} &\\makecell{Class \\\\ C}\\\\\n'
+table_caption='Price based overhead using different approaches'
+from_csv_to_tex('tables/classifications_methods_price_a_b_c.csv', table_header, table_caption)
 
 
 # Save the result

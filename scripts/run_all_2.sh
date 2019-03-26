@@ -2,7 +2,7 @@
 
 exit
 
-declare -a AZURE_MACHINES=( 1 2 3 4 9 55 )
+declare -a AZURE_MACHINES=( 61 107 142 67 113 143 46 99 144 116 )
 declare -a NUMBER_INSTANCES=( 1 2 4 8 16 32 )
 
 
@@ -17,25 +17,19 @@ for i in `seq ${#AZURE_MACHINES[@]} -1 1`; do
 done
 
 
+# -----------   Experiments  -------------
+61	"Standard_D4s_v3",				"4",			"16384"
+107	"Standard_E4s_v3",				"4",			"32768"
+142	"Standard_F4s_v2",				"4",			"8000"
 
-# -----------   intense  -------------
+67	"Standard_D8s_v3",				"8",			"32768"
+113	"Standard_E8s_v3",				"8",			"65536"
+143	"Standard_F8s_v2",				"8",			"16000"
 
-
-
-# -----------   Running  -------------
-
-# -----------   Done  -------------
-
-
-
-108 "Standard_E64_v3"
-45 "Standard_D16_v3"
-55 "Standard_D32_v3"
-98 "Standard_E16_v3"
-
-55	"Standard_D32_v3",
-108	"Standard_E64_v3"
-144	"Standard_F16s_v2"
+46	"Standard_D16s_v3",				"16",			"65536"
+99	"Standard_E16s_v3",				"16",			"131072"
+144	"Standard_F16s_v2",				"16",			"32000"
+116	"Standard_F16s",				"16",			"32768"
 
 #  ________________________
 
