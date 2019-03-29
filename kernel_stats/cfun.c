@@ -1,9 +1,18 @@
 #include <stdio.h>
-int cfun_(int *ip, double *xp)
+
+// jeferson
+extern void init_timestep_();
+extern void begin_timestep_();
+extern void end_timestep_(unsigned int maxsteps);
+
+
+int main(int argc, char const *argv[])
 {
-  int i = *ip;
-  double x = *xp;
-  printf("This is in C function...\n");
-  printf("i = %d, x = %g\n", i, x);
-  return 0;
+	for (int i = 0; i < 10000; ++i)
+	{
+		begin_timestep_();
+		// Code goes here
+		end_timestep_(9999);
+	}
+	return 0;
 }
