@@ -31,6 +31,7 @@ for i_column, column in enumerate(df.columns):
 			sum_time_samples+=df.iloc[samples,i_column]
 			samples+=1;
 		df2.loc[i_column,'mean_%s_sec'%(seconds)]= sum_time_samples/float(samples) # df.iloc[:samples,i_column].mean()
+	df2.loc[i_column,'mean_general_sec']= df.iloc[:,i_column].mean()
 	sys.stdout.write('\n')
 	sys.stdout.flush()
 

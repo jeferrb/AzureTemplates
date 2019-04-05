@@ -30,6 +30,8 @@ LOG_FILE="${RESULTS_DIRECTORY}/logfile_${GROUP_NAME}.log"
 PASSWORD="pass${RANDOM}lala"
 DISK_PASSWORD="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
 COORDINATOR_KEY=${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
+# IMAGE_REFERENCE="/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image" # singularity (original)
+IMAGE_REFERENCE="/subscriptions/054e3a7f-c270-4673-ae8d-bbeae92058d7/resourceGroups/toy2dac_image/providers/Microsoft.Compute/images/Toy2Dac-image-20190405111950" # Will-toy2dac
 USERNAME="username"
 NUMBER_CREATION_ATTEMPTS=10
 
@@ -41,15 +43,15 @@ createMachines(){
     echo "Creating the machine number $1"
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" \
     --resource-group $GROUP_NAME \
-    --template-file azuredeploy_multiple_from_image.json \
+    --template-file azuredeploy_from_generic_image.json \
     --parameters vmSize=$2 vmName="testMPI${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
-    adminPassword=$PASSWORD scriptParameterPassMount=$PASSWORD \
-    adminPublicKey="`cat ~/.ssh/id_rsa.pub`" adminUsername=$USERNAME -vv &>> ${LOG_FILE}
+    adminPassword=$PASSWORD scriptParameterPassMount=$PASSWORD imageReference=$IMAGE_REFERENCE \
+    adminPublicKey="`cat ~/.ssh/id_rsa.pub`" adminUsername=$USERNAME &>> ${LOG_FILE}
 }
 
 retrieveResults(){ # It is not needed anymore
     for ssh_addr in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
-        scp "${ssh_addr}:/home/username/*.log" ${RESULTS_DIRECTORY} &
+        scp "${ssh_addr}:/home/${USERNAME}/*.log" ${RESULTS_DIRECTORY} &
     done
     wait
 }
@@ -96,7 +98,7 @@ case ${2} in
             ssh-keygen -R $i
             ssh-keygen -R `dig +short $i`
             ssh-keyscan -H $i >> ~/.ssh/known_hosts
-            ssh username@${i} << EOF
+            ssh ${USERNAME}@${i} << EOF
                 cp -r ${BIN_PATH} ${NEW_BIN_PATH}
 EOF
         done
@@ -121,7 +123,7 @@ EOF
         # copy coordinator (master) credential to all slaves
         for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
             echo "Put ssh key on $i"
-            ssh-copy-id -f -i $COORDINATOR_KEY "username@${i}"
+            ssh-copy-id -f -i $COORDINATOR_KEY "${USERNAME}@${i}"
         done
 
     ;;

@@ -112,11 +112,8 @@ while len(params)!=0:
 		if chart_points:
 			with open('%s/%s.data.json'%(output_dir, experiment), 'w') as outfile:
 				json.dump(df3, outfile)
-
 	print("open %s" % output_dir)
-
 quit()
-
 
 for file in glob.glob('%s/*.data.json'%(output_dir)):
 	with open(file) as infile:

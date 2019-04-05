@@ -31,9 +31,9 @@ df = pd.read_csv(file)
 # npb_execution=1
 npb_classes=['A','B','C','D']
 npb_benchs= ['bt', 'cg', 'ep', 'ft', 'is', 'lu', 'mg', 'sp']
-df['mean_500'] = float('nan')
-df['mean_general'] = float('nan')
-df['mean_%s_sec'%first_seconds] = float('nan')
+# df['mean_500'] = float('nan')
+# df['mean_general'] = float('nan')
+# df['mean_%s_sec'%first_seconds] = float('nan')
 
 # def calculate_time_s (row):
 # 	return row/0.0005
