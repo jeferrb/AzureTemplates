@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import collections, subprocess, os, datetime
+import collections, subprocess, os, datetime, sys
 
 # python3 run_scalability_tests.py | tee -a my_run_scalability_tests.log
 
@@ -9,10 +9,17 @@ import collections, subprocess, os, datetime
 
 '''
 
+# print ("Usage: %s [binary_dir]"% sys.argv[0])
+if (len(sys.argv) < 2):
+	bin_path = '$HOME/mymountpoint/NPB3.3-MPI/bin/'
+else
+	bin_path = sys.argv[1]
+print('Going to execute binaries at: ', bin_path)
+
 experiments = [
 	[16],
 	# [12, 13],
-	[16, 16],
+	# [16, 16],
 	# [12, 12, 12],
 	# [12, 12, 12, 13],
 	# [16, 16, 16, 16],
@@ -50,7 +57,7 @@ for experiment in experiments:
 		key = slot
 		value = hostfile[key]
 		slots+= ' ' + str(value) + ' ' + str(key)
-	cmd = base_cmd + ' execute ' + str(number_process) + ' ' + slots
+	cmd = base_cmd + ' execute ' + str(number_process) + ' ' + slots + ' ' + bin_path
 	print('*************   *************   *************   *************   *************')
 	print(cmd)
 	print('*************   *************   *************   *************   *************')

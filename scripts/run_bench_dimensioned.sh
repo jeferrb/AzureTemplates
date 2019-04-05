@@ -31,7 +31,8 @@ run_bench() {
       echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${logfile}"
       echo "TIME: STARTING: " | tee -a "${logfile}"
       date | tee -a "${logfile}"
-      mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf stat "${path}/${name}" | tee -a "${logfile}"
+      # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf stat "${path}/${name}" | tee -a "${logfile}"
+      mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${logfile}"
       echo "TIME: ENDING: " | tee -a "${logfile}"
       date | tee -a "${logfile}"
     done

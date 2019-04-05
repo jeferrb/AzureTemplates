@@ -15,7 +15,6 @@
 set -x
 # cd $HOME/AzureTemplates
 GROUP_NAME=${1}
-BIN_PATH="$HOME/mymountpoint/NPB3.3-MPI/bin/"
 NEW_BIN_PATH="$HOME/bin"
 NUMBER_REPETITIONS=3
 REGION="East US"
@@ -32,7 +31,8 @@ DISK_PASSWORD="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM
 COORDINATOR_KEY=${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
 # IMAGE_REFERENCE="/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image" # singularity (original)
 IMAGE_REFERENCE="/subscriptions/054e3a7f-c270-4673-ae8d-bbeae92058d7/resourceGroups/toy2dac_image/providers/Microsoft.Compute/images/Toy2Dac-image-20190405111950" # Will-toy2dac
-USERNAME="username"
+USERNAME="ubuntu"
+EXECUTION_SCRIPT="./scripts/run_bench_dimensioned.sh"
 NUMBER_CREATION_ATTEMPTS=10
 
 mkdir -p ${RESULTS_DIRECTORY}
@@ -46,7 +46,7 @@ createMachines(){
     --template-file azuredeploy_from_generic_image.json \
     --parameters vmSize=$2 vmName="testMPI${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
     adminPassword=$PASSWORD scriptParameterPassMount=$PASSWORD imageReference=$IMAGE_REFERENCE \
-    adminPublicKey="`cat ~/.ssh/id_rsa.pub`" adminUsername=$USERNAME &>> ${LOG_FILE}
+    adminPublicKey="`cat ~/.ssh/id_rsa.pub`" adminUsername=$USERNAME |& tee -a ${LOG_FILE}
 }
 
 retrieveResults(){ # It is not needed anymore
@@ -61,6 +61,7 @@ case ${2} in
     'create')
         VM_SIZE=${VM_SIZES[${3}]}
         NUMBER_EXPECTED_INSTANCES=${4}
+        BIN_PATH="${5}"
         NUMBER_INITIAL_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
         echo "Let's ${2} $NUMBER_EXPECTED_INSTANCES $VM_SIZE at $GROUP_NAME group"
         if [ ! -f ${LOG_FILE} ]; then
@@ -161,7 +162,7 @@ EOF
         SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 
         # Push the scripts and hostfile to coordinator
-        scp scripts/run_bench_dimensioned.sh ${RESULTS_DIRECTORY}/hostfile ${SSH_ADDR}:
+        scp $EXECUTION_SCRIPT ${RESULTS_DIRECTORY}/hostfile ${SSH_ADDR}:
 
         ssh ${SSH_ADDR} << EOF
             set -x
@@ -181,7 +182,7 @@ EOF
 
         # Effectively execute the benchmark
         ssh ${SSH_ADDR} << EOF
-            bash ./run_bench_dimensioned.sh ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
+            bash ./${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
 EOF
 
     ;;
