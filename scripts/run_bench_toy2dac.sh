@@ -9,7 +9,8 @@ set -x
 NUMBER_REPETITIONS=${1}
 # BIN_PATH=${2}
 NUMBER_JOBS=${3}
-OUT_DIR="$HOME/mymountpoint${4##*mymountpoint}"
+OUT_DIR=${4}
+OUT_DIR="$HOME/mymountpoint${OUT_DIR##*mymountpoint}"
 BIN_FILE="~/toy2dac/bin/toy2dac"
 name="${BIN_FILE##*/}"
 

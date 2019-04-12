@@ -141,6 +141,7 @@ EOF
 
         # create a custom hostfile to divide the jobs along machines
         rm -f ${RESULTS_DIRECTORY}/hostfile
+        rm -f ${RESULTS_DIRECTORY}/machines
         host=4 # starts with 4, the fisrt IP of subnet
         num_machines_arg=5 # the number of machines is the fourth+1 (sixth+1, eighth+1, ...) argument
         while [[ -n "${!num_machines_arg}" ]]; do
