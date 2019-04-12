@@ -18,9 +18,9 @@ else:
 print('Going to execute the script: ', bench_script)
 
 experiments = [
-	# [16],
+	[16],
 	# [12, 13],
-	[16, 16],
+	# [16, 16],
 	# [12, 12, 12],
 	# [12, 12, 12, 13],
 	# [16, 16, 16, 16],
@@ -41,6 +41,8 @@ base_cmd = ' '.join(['bash', script_name, group_name])
 azure_machines = 116 # Standard_F16s
 current_created_instances = 0
 for experiment in experiments:
+	if len(experiment)==0:
+		break
 	number_instances = len(experiment)
 	number_process = sum(experiment)
 	# Create more instances?
