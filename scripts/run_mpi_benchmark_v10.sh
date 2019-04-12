@@ -187,6 +187,7 @@ EOF
             done
 EOF
         # Effectively execute the benchmark
+        echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
         ssh ${SSH_ADDR} << EOF
             cd execute_marmousi_template
             bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
