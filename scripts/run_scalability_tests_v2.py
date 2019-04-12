@@ -11,15 +11,16 @@ import collections, subprocess, os, datetime, sys
 
 # print ("Usage: %s [binary_dir]"% sys.argv[0])
 if (len(sys.argv) < 2):
-	bin_path = '$HOME/mymountpoint/NPB3.3-MPI/bin/'
-else
-	bin_path = sys.argv[1]
-print('Going to execute binaries at: ', bin_path)
+	bench_script =  './scripts/run_bench_dimensioned.sh'
+	bench_script =  './scripts/run_bench_toy2dac.sh'
+else:
+	bench_script = sys.argv[1]
+print('Going to execute the script: ', bench_script)
 
 experiments = [
-	[16],
+	# [16],
 	# [12, 13],
-	# [16, 16],
+	[16, 16],
 	# [12, 12, 12],
 	# [12, 12, 12, 13],
 	# [16, 16, 16, 16],
@@ -36,7 +37,7 @@ experiments = [
 now = datetime.datetime.now()
 group_name = now.strftime("mygroup-%d-%m-%Y")
 script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
-base_cmd = 'bash ' + script_name + ' ' + group_name
+base_cmd = ' '.join(['bash', script_name, group_name])
 azure_machines = 116 # Standard_F16s
 current_created_instances = 0
 for experiment in experiments:
@@ -44,7 +45,7 @@ for experiment in experiments:
 	number_process = sum(experiment)
 	# Create more instances?
 	if (current_created_instances < number_instances):
-		cmd = base_cmd + ' create ' + str(azure_machines) + ' ' + str(number_instances - current_created_instances)
+		cmd = ' '.join([base_cmd, 'create', str(azure_machines), str(number_instances - current_created_instances)])
 		print('*************   *************   *************   *************   *************')
 		print(cmd)
 		print('*************   *************   *************   *************   *************')
@@ -57,7 +58,7 @@ for experiment in experiments:
 		key = slot
 		value = hostfile[key]
 		slots+= ' ' + str(value) + ' ' + str(key)
-	cmd = base_cmd + ' execute ' + str(number_process) + ' ' + slots + ' ' + bin_path
+	cmd = ' '.join([base_cmd, 'execute', bench_script, str(number_process), slots])
 	print('*************   *************   *************   *************   *************')
 	print(cmd)
 	print('*************   *************   *************   *************   *************')
@@ -68,7 +69,7 @@ cmd = base_cmd + ' destroy'
 print('*************   *************   *************   *************   *************')
 print(cmd)
 print('*************   *************   *************   *************   *************')
-subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+# subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 
 # azure_machines =98
 # number_instances =4

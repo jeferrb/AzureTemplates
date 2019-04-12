@@ -7,7 +7,7 @@
 #  Por fim ele deve matar o grupo
 # Ele recebe como argumento o nome do GROUP_NAME e o segundo argumento sera:
 #   1 - para criar uma maquina, sendo o terceiro argumento o tipo da maquina, o quarto o numero de maquinas
-#   2 - para disparar os experimentos, sendo o terceiro argumento o numero de jobs a executar e a sequencia tuplas de:
+#   2 - para disparar os experimentos, sendo o terceiro argumento o nome do script, o quarto argumento o numero de jobs a executar e a sequencia tuplas de:
 #       [#maquinas com #slots]  (maximo dois tipos) - para compor o hostfile que deve ser enviado para todas as maquinas
 #   3 - para recuperar os resultados e destruir o grupo
 # E chamado pelo run_scalability_test.py
@@ -32,7 +32,8 @@ COORDINATOR_KEY=${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
 # IMAGE_REFERENCE="/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image" # singularity (original)
 IMAGE_REFERENCE="/subscriptions/054e3a7f-c270-4673-ae8d-bbeae92058d7/resourceGroups/toy2dac_image/providers/Microsoft.Compute/images/Toy2Dac-image-20190405111950" # Will-toy2dac
 USERNAME="ubuntu"
-EXECUTION_SCRIPT="./scripts/run_bench_dimensioned.sh"
+EXECUTION_PATH="~/"
+# EXECUTION_SCRIPT="./scripts/run_bench_dimensioned.sh"
 NUMBER_CREATION_ATTEMPTS=10
 
 mkdir -p ${RESULTS_DIRECTORY}
@@ -61,7 +62,7 @@ case ${2} in
     'create')
         VM_SIZE=${VM_SIZES[${3}]}
         NUMBER_EXPECTED_INSTANCES=${4}
-        BIN_PATH="${5}"
+        BIN_PATH="${5}" # TODO jeferson
         NUMBER_INITIAL_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
         echo "Let's ${2} $NUMBER_EXPECTED_INSTANCES $VM_SIZE at $GROUP_NAME group"
         if [ ! -f ${LOG_FILE} ]; then
@@ -101,6 +102,7 @@ case ${2} in
             ssh-keyscan -H $i >> ~/.ssh/known_hosts
             ssh ${USERNAME}@${i} << EOF
                 cp -r ${BIN_PATH} ${NEW_BIN_PATH}
+                echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
 EOF
         done
 
@@ -132,19 +134,20 @@ EOF
     # TODO: colocar o tipo das instancias no logfile
     # VM_SIZE=`grep "vmSize" ${LOG_FILE} -A2 | tail -n1 | awk '{print $2}' | sed 's/\"//g'`
 
-        NUMBER_JOBS="${3}"
+        EXECUTION_SCRIPT="${3}"
+        NUMBER_JOBS="${4}"
         echo "Let's ${2} $NUMBER_JOBS jobs at $GROUP_NAME group"
         NUMBER_CURRENT_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
-        
 
         # create a custom hostfile to divide the jobs along machines
         rm -f ${RESULTS_DIRECTORY}/hostfile
         host=4 # starts with 4, the fisrt IP of subnet
-        num_machines_arg=4 # the number of machines is the fourth (sixth, eighth, ...) argument
+        num_machines_arg=5 # the number of machines is the fourth+1 (sixth+1, eighth+1, ...) argument
         while [[ -n "${!num_machines_arg}" ]]; do
             num_slots_arg=$((num_machines_arg+1))
             for (( i = 0; i < "${!num_machines_arg}"; i++ )); do
                 echo "10.0.0.${host} slots=${!num_slots_arg}" >> ${RESULTS_DIRECTORY}/hostfile
+                echo "10.0.0.${host}:${!num_slots_arg}" >> ${RESULTS_DIRECTORY}/machines
                 host=$((host+1))
             done
             num_machines_arg=$((num_machines_arg+2))
@@ -162,7 +165,8 @@ EOF
         SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 
         # Push the scripts and hostfile to coordinator
-        scp $EXECUTION_SCRIPT ${RESULTS_DIRECTORY}/hostfile ${SSH_ADDR}:
+        scp ${RESULTS_DIRECTORY}/hostfile ${RESULTS_DIRECTORY}/machines ${SSH_ADDR}:
+        scp ${EXECUTION_SCRIPT##*/} ${SSH_ADDR}:
 
         ssh ${SSH_ADDR} << EOF
             set -x
@@ -171,18 +175,20 @@ EOF
             for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
+                scp -r  ~/mymountpoint/toy2dac/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
+                scp -r  ~/mymountpoint/toy2dac/bin/toy2dac "10.0.0.\${host}":toy2dac/bin/toy2dac
             # Copy the execution script to all machines
-                scp *.sh "10.0.0.\${host}":
+                scp ${EXECUTION_SCRIPT##*/} "10.0.0.\${host}":
             done
             # Copy known host that contains all machines to all machines
             for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 scp .ssh/known_hosts "10.0.0.\${host}":.ssh
             done
 EOF
-
         # Effectively execute the benchmark
         ssh ${SSH_ADDR} << EOF
-            bash ./${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
+            cd execute_marmousi_template
+            bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
 EOF
 
     ;;
