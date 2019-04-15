@@ -29,6 +29,7 @@ LOG_FILE="${RESULTS_DIRECTORY}/logfile_${GROUP_NAME}.log"
 PASSWORD="pass${RANDOM}lala"
 DISK_PASSWORD="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
 COORDINATOR_KEY=${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
+COORDINATOR_PROF=${RESULTS_DIRECTORY}/coordinator.profile
 # IMAGE_REFERENCE="/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image" # singularity (original)
 IMAGE_REFERENCE="/subscriptions/054e3a7f-c270-4673-ae8d-bbeae92058d7/resourceGroups/toy2dac_image/providers/Microsoft.Compute/images/Toy2Dac-image-20190405111950" # Will-toy2dac
 USERNAME="ubuntu"
@@ -113,20 +114,26 @@ EOF
             az group delete --resource-group ${GROUP_NAME} --yes --no-wait
         fi
 
-        # If there is no coordinator key, create one
+        # If there is no coordinator key and profile, create one
         if [ ! -f $COORDINATOR_KEY ]; then
             # Create an id RSA for the coordenator
             ssh ${SSH_ADDR} << EOF
                 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+                echo >> .profile
+                echo source /opt/intel/compilers_and_libraries_2018.3.222/linux/bin/compilervars.sh -arch intel64 -platform linux >> .profile
+                echo source /opt/intel/parallel_studio_xe_2018.3.051/bin/psxevars.sh >> .profile
+                echo >> .profile
 EOF
             # retrieve coordinator (master) credential
             scp ${SSH_ADDR}:.ssh/id_rsa.pub $COORDINATOR_KEY
+            scp ${SSH_ADDR}:.profile $COORDINATOR_PROF
         fi
 
         # copy coordinator (master) credential to all slaves
         for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
             echo "Put ssh key on $i"
             ssh-copy-id -f -i $COORDINATOR_KEY "${USERNAME}@${i}"
+            scp COORDINATOR_PROF "${USERNAME}@${i}:.profile"
         done
 
     ;;
@@ -188,6 +195,7 @@ EOF
 EOF
         # Effectively execute the benchmark
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
+
         ssh ${SSH_ADDR} << EOF
             cd execute_marmousi_template
             bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
