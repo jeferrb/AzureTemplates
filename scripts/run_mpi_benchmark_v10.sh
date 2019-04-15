@@ -184,7 +184,7 @@ EOF
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
                 scp -r  ~/mymountpoint/toy2dac/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
-                scp -r  ~/mymountpoint/toy2dac/bin/toy2dac "10.0.0.\${host}":toy2dac/bin/toy2dac
+                scp -r  ~/mymountpoint/toy2dac "10.0.0.\${host}":
             # Copy the execution script to all machines
                 scp ${EXECUTION_SCRIPT##*/} "10.0.0.\${host}":
             done
