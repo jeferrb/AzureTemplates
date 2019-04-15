@@ -174,7 +174,7 @@ EOF
 
         # Push the scripts and hostfile to coordinator
         scp ${RESULTS_DIRECTORY}/hostfile ${RESULTS_DIRECTORY}/machines ${SSH_ADDR}:
-        scp ${EXECUTION_SCRIPT##*/} ${SSH_ADDR}:
+        scp ${EXECUTION_SCRIPT} ${SSH_ADDR}:
 
         ssh ${SSH_ADDR} << EOF
             set -x
@@ -197,8 +197,7 @@ EOF
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
 
         ssh ${SSH_ADDR} << EOF
-            cd execute_marmousi_template
-            bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
+            bash --login -c 'cd execute_marmousi_template ; bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
 EOF
 
     ;;
