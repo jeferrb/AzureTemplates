@@ -19,7 +19,7 @@ execute_bench(){
 
 for machine_name in "${AZURE_MACHINES[@]}"; do
 	declare -a GROUP_NAME=mygroup-klp-$(date +%d-%m-%Y)-machine-${AZURE_MACHINES[$i]}
-	execute_bench $GROUP_NAME ${machine_name} $SCRIPT_NAME
+	execute_bench $GROUP_NAME ${machine_name} $SCRIPT_NAME &
 	sleep 30
 done
 wait
