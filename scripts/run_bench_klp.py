@@ -88,7 +88,6 @@ contThreads = 0
 mutex = BoundedSemaphore(value=1)
 
 while i < len(runs):
-	print("Run: ", runs[i])
 	abriuThread = False
 	mutex.acquire()
 	if contThreads < numThreads:
