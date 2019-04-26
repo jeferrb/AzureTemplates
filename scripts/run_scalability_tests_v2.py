@@ -35,7 +35,7 @@ experiments = [
 []]
 
 now = datetime.datetime.now()
-group_name = now.strftime("mygroup_2-%d-%m-%Y")
+group_name = now.strftime("mygroup-2-%d-%m-%Y")
 script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
 base_cmd = ' '.join(['bash', script_name, group_name])
 azure_machines = 116 # Standard_F16s
