@@ -133,7 +133,7 @@ EOF
         for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
             echo "Put ssh key on $i"
             ssh-copy-id -f -i $COORDINATOR_KEY "${USERNAME}@${i}"
-            scp COORDINATOR_PROF "${USERNAME}@${i}:.profile"
+            scp $COORDINATOR_PROF "${USERNAME}@${i}:.profile"
         done
 
     ;;
