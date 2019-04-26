@@ -30,8 +30,8 @@ PASSWORD="pass${RANDOM}lala"
 DISK_PASSWORD="gGEn7CeoUxlkf/EY6sUlrZFg4ebJw3ZkjJ0QvZ5viW0ES+bRDllVwLQy17M9PcWaM4PoRGhqycd9BFE7OadAqg=="
 COORDINATOR_KEY=${RESULTS_DIRECTORY}/id_rsa_coodinator_${GROUP_NAME}.pub
 COORDINATOR_PROF=${RESULTS_DIRECTORY}/coordinator.profile
-IMAGE_REFERENCE="/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image" # singularity (original)
-# IMAGE_REFERENCE="/subscriptions/054e3a7f-c270-4673-ae8d-bbeae92058d7/resourceGroups/toy2dac_image/providers/Microsoft.Compute/images/Toy2Dac-image-20190405111950" # Will-toy2dac
+# IMAGE_REFERENCE="/subscriptions/6878f6a8-b14a-4455-a1c1-655f5f5fac2d/resourceGroups/image-2/providers/Microsoft.Compute/images/perf-image" # singularity (original)
+IMAGE_REFERENCE="/subscriptions/054e3a7f-c270-4673-ae8d-bbeae92058d7/resourceGroups/toy2dac_image/providers/Microsoft.Compute/images/Toy2Dac-image-20190405111950" # Will-toy2dac
 USERNAME="ubuntu"
 EXECUTION_PATH="~/"
 # EXECUTION_SCRIPT="./scripts/run_bench_dimensioned.sh"
@@ -183,7 +183,7 @@ EOF
             for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
-                scp -r  ~/mymountpoint/toy2dac/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
+                scp -r  ~/mymountpoint/toy2dac_instrumented/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
                 scp -r  ~/mymountpoint/toy2dac "10.0.0.\${host}":
             # Copy the execution script to all machines
                 scp ${EXECUTION_SCRIPT##*/} "10.0.0.\${host}":
