@@ -35,24 +35,24 @@ experiments = [
 []]
 
 now = datetime.datetime.now()
-group_name = now.strftime("mygroup-%d-%m-%Y")
+group_name = now.strftime("mygroup_2-%d-%m-%Y")
 script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
 base_cmd = ' '.join(['bash', script_name, group_name])
 azure_machines = 116 # Standard_F16s
-current_created_instances = 0
+# current_created_instances = 0
 for experiment in experiments:
 	if len(experiment)==0:
 		break
 	number_instances = len(experiment)
 	number_process = sum(experiment)
 	# Create more instances?
-	if (current_created_instances < number_instances):
-		cmd = ' '.join([base_cmd, 'create', str(azure_machines), str(number_instances - current_created_instances)])
-		print('*************   *************   *************   *************   *************')
-		print(cmd)
-		print('*************   *************   *************   *************   *************')
-		subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-		current_created_instances = number_instances
+	# if (current_created_instances < number_instances):
+	cmd = ' '.join([base_cmd, 'create', str(azure_machines), str(number_instances)])
+	print('*************   *************   *************   *************   *************')
+	print(cmd)
+	print('*************   *************   *************   *************   *************')
+	subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		# current_created_instances = number_instances
 	# Compose a hostfile patern and trigger experiments
 	hostfile = collections.Counter(experiment)
 	slots =''
