@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -x
+
 declare -a SCRIPT_NAME="scripts/run_bench_klp.py" #TODO
-declare -a AZURE_MACHINES=(2 100 11 101 118 119 17 32 33 47 48 50) # 10)
+declare -a AZURE_MACHINES=(2 100 ) #11 101 118 119 17 32 33 47 48 50) # 10)
 declare -a QTD_MACHINES=1
 
 execute_bench(){
@@ -17,9 +19,9 @@ execute_bench(){
 	set +x
 }
 
-for machine_name in "${AZURE_MACHINES[@]}"; do
-	declare -a GROUP_NAME=mygroup-klp-$(date +%d-%m-%Y)-machine-${AZURE_MACHINES[$i]}
-	execute_bench $GROUP_NAME ${machine_name} $SCRIPT_NAME &
+for machine_number in "${AZURE_MACHINES[@]}"; do
+	declare -a GROUP_NAME=mygroup-klp-$(date +%d-%m-%Y)-machine-${machine_number}
+	execute_bench $GROUP_NAME ${machine_number} $SCRIPT_NAME &
 	sleep 30
 done
 wait
