@@ -3,7 +3,7 @@
 set -x
 
 declare -a SCRIPT_NAME="scripts/run_bench_klp.py" #TODO
-declare -a AZURE_MACHINES=(2 100 ) #11 101 118 119 17 32 33 47 48 50) # 10)
+declare -a AZURE_MACHINES=(11 101 118 119 17 32 33 47 48 50) # 10 2 100 )
 declare -a QTD_MACHINES=1
 
 execute_bench(){
