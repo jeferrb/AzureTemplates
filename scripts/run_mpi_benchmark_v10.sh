@@ -64,7 +64,7 @@ case ${2} in
         VM_SIZE=${VM_SIZES[${3}]}
         NUMBER_EXPECTED_INSTANCES=${4}
         BIN_PATH="${5}" # TODO jeferson
-        NUMBER_INITIAL_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
+        # NUMBER_INITIAL_INSTANCES=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
         echo "Let's ${2} $NUMBER_EXPECTED_INSTANCES $VM_SIZE at $GROUP_NAME group"
         if [ ! -f ${LOG_FILE} ]; then
             echo "This group does not exists yeat, let's create it now"
@@ -79,7 +79,7 @@ case ${2} in
 
         remaining_creation_attempts=$NUMBER_CREATION_ATTEMPTS
         current_machines=`grep "ssh " ${LOG_FILE} | wc -l | awk '{print $1}'`
-        while [[ $current_machines -ne $((NUMBER_EXPECTED_INSTANCES+NUMBER_INITIAL_INSTANCES)) && remaining_creation_attempts -gt 0 ]]; do
+        while [[ $current_machines -ne $NUMBER_EXPECTED_INSTANCES && remaining_creation_attempts -gt 0 ]]; do
             for (( machine_number = current_machines; machine_number < $((current_machines + NUMBER_EXPECTED_INSTANCES)) ; machine_number++ )); do
                 createMachines $machine_number ${VM_SIZE} &
                 sleep 10
