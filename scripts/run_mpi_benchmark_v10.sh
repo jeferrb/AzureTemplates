@@ -118,15 +118,17 @@ EOF
         if [ ! -f $COORDINATOR_KEY ]; then
             # Create an id RSA for the coordenator
             ssh ${SSH_ADDR} << EOF
+                set -x
                 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-                echo >> .profile
-                echo source /opt/intel/compilers_and_libraries_2018.3.222/linux/bin/compilervars.sh -arch intel64 -platform linux >> .profile
-                echo source /opt/intel/parallel_studio_xe_2018.3.051/bin/psxevars.sh >> .profile
-                echo >> .profile
 EOF
             # retrieve coordinator (master) credential
             scp ${SSH_ADDR}:.ssh/id_rsa.pub $COORDINATOR_KEY
             scp ${SSH_ADDR}:.profile $COORDINATOR_PROF
+            cat << EOF >> $COORDINATOR_PROF
+source /opt/intel/compilers_and_libraries_2018.3.222/linux/bin/compilervars.sh -arch intel64 -platform linux
+source /opt/intel/parallel_studio_xe_2018.3.051/bin/psxevars.sh
+
+EOF
         fi
 
         # copy coordinator (master) credential to all slaves
@@ -197,6 +199,7 @@ EOF
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
 
         ssh ${SSH_ADDR} << EOF
+            set -x
             bash --login -c 'cd execute_marmousi_template ; bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
 EOF
 
