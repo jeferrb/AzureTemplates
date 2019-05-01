@@ -57,7 +57,7 @@ experiments = [
 for exp in exp64:
 	now = datetime.datetime.now()
 	azure_machine_name,azure_machine_num = exp[0],exp[1]
-	experiments=[exp[2]]*exp[3]
+	experiments=[[exp[2]]*exp[3]]
 	print('\n\n\n\n\nRunning: azure_machine_name',azure_machine_name,'azure_machine_num',azure_machine_num, 'experiments', experiments, '\n\n\n\n')
 	today_str = now.strftime("%d-%m-%Y")
 	group_name = "group-%d-%s-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), today_str)
