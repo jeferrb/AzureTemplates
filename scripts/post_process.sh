@@ -238,15 +238,11 @@ cat times.txt | paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 	# klp multiple machines
-	for result in results_mygroup-klp-26-04-2019-machine-*; do
-		cd $result/result/
+	for result in results_mygroup-klp-2*-04-2019-machine-*/result/source_*.log; do
 		echo $result
-		for test in source_*.log; do
-			ls $test
-			echo ${result}_${test} > ${test}.csv
-			grep TIME $test | awk '{print $2}' >> ${test}.csv
-		done
-		cd ../../
+		echo ${result} > ${result}.csv
+		grep TIME $result | awk '{print $2}' >> ${result}.csv
 	done
-
 	paste -d, results_mygroup-klp-26-04-2019-machine-*/result/*.csv > klp_results.csv
+
+
