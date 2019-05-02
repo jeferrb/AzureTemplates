@@ -246,3 +246,13 @@ cat times.txt | paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - -
 	paste -d, results_mygroup-klp-26-04-2019-machine-*/result/*.csv > klp_results.csv
 
 
+
+# toy2dac
+# python3 ./scripts/run_scalability_tests_v3.py
+
+cd mymountpoint
+for i in results_g-* ;do
+	echo $i > result/${i}.csv
+	grep ParamountItEnd ${i}/result/toy2dac_exec_1.log | awk '{print $10}' >> result/${i}.csv # delta iterations
+
+paste -d ',' results_g-*/result/*.csv > results_toy2dac_may1.csv
