@@ -21,6 +21,8 @@ name="${BIN_FILE##*/}"
 # fi
 # cd "${BIN_PATH}"
 
+date > "${logfile}"
+
 for i in `seq ${NUMBER_REPETITIONS}`; do
     logfile="${OUT_DIR}/${name}_exec_${i}.log"
     echo "Running ${name}_native (${i}/${NUMBER_REPETITIONS})" | tee -a "${logfile}"
