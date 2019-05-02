@@ -60,7 +60,7 @@ for exp in exp64:
 	experiments=[[exp[2]]*exp[3]]
 	print('\n\n\n\n\nRunning: azure_machine_name',azure_machine_name,'azure_machine_num',azure_machine_num, 'experiments', experiments, '\n\n\n\n')
 	today_str = now.strftime("%d-%m-%Y")
-	group_name = "group-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
+	group_name = "gro-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
 	script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
 	base_cmd = ' '.join(['bash', script_name, group_name])
 	for experiment in experiments:
