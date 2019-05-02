@@ -9,11 +9,11 @@ import collections, subprocess, os, datetime, sys
 '''
 # Machine	Num	Cores	Qtd
 exp64=[
-	["Standard_F16s_v2",144,16,1],
-	["Standard_F16s_v2",144,16,2],
-	["Standard_F16s_v2",144,16,3],
-	["Standard_F16s_v2",144,16,4],
-	["Standard_F16s_v2",144,16,16],
+	# ["Standard_F16s_v2",144,16,1],
+	# ["Standard_F16s_v2",144,16,2],
+	# ["Standard_F16s_v2",144,16,3],
+	# ["Standard_F16s_v2",144,16,4],
+	# ["Standard_F16s_v2",144,16,16],
 	["Standard_F64s_v2",146,64,4],
 	["Standard_F64s_v2",146,64,1],
 	["Standard_D64_v3",64,64,1],
