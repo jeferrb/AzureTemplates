@@ -46,7 +46,7 @@ createMachines(){
     az group deployment create --name "SingularityTest$(whoami)$(date +%s)" \
     --resource-group $GROUP_NAME \
     --template-file azuredeploy_from_generic_image.json \
-    --parameters vmSize=$2 vmName="testMPI${1}" dnsLabelPrefix="my${GROUP_NAME}dnsprefix${1}" \
+    --parameters vmSize=$2 vmName="testMPI${1}" dnsLabelPrefix="prefix${RANDOM}${1}" \
     adminPassword=$PASSWORD scriptParameterPassMount=$PASSWORD imageReference=$IMAGE_REFERENCE \
     adminPublicKey="`cat ~/.ssh/id_rsa.pub`" adminUsername=$USERNAME |& tee -a ${LOG_FILE}
 }
