@@ -252,7 +252,15 @@ cat times.txt | paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 cd mymountpoint
 for i in results_g-* ;do
-	echo $i > result/${i}.csv
-	grep ParamountItEnd ${i}/result/toy2dac_exec_1.log | awk '{print $10}' >> result/${i}.csv # delta iterations
+	if [ -f  "$i/result/toy2dac_exec_1.log" ]; then
+		echo $i > $i/result/${i}.csv
+		START=`grep -A1 'TIME_STARTING'  $i/result/toy2dac_exec_1.log | tail -n 1 | awk '{print $4}' | awk -F : '{ hours = 3600*$1 }{ minutes = 60*$2 }{ seconds = $3 }{print hours+minutes+seconds}'`
+		END=`grep -A1 'TIME_ENDING'  $i/result/toy2dac_exec_1.log | tail -n 1 | awk '{print $4}' | awk -F : '{ hours = 3600*$1 }{ minutes = 60*$2 }{ seconds = $3 }{print hours+minutes+seconds}'`
+		echo $((END-START)) >> $i/result/${i}.csv
+		grep ParamountItEnd ${i}/result/toy2dac_exec_1.log | awk '{print $10}' >> $i/result/${i}.csv
+	else
+		echo "$i has no logs"
+	fi
+done
 
-paste -d ',' results_g-*/result/*.csv > results_toy2dac_may1.csv
+paste -d ',' results_g-*/result/*.csv > results_toy2dac_may02.csv
