@@ -250,7 +250,7 @@ cat times.txt | paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - -
 # toy2dac
 # python3 ./scripts/run_scalability_tests_v3.py
 
-cd mymountpoint
+# cd mymountpoint
 for i in results_g-* ;do
 	if [ -f  "$i/result/toy2dac_exec_1.log" ]; then
 		echo $i > $i/result/${i}.csv
@@ -263,4 +263,4 @@ for i in results_g-* ;do
 	fi
 done
 
-paste -d ',' results_g-*/result/*.csv > results_toy2dac_may02.csv
+paste -d ',' results_g-*/result/*.csv > results_toy2dac_06-may.csv
