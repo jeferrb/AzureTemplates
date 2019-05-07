@@ -201,8 +201,7 @@ EOF
 
         ssh ${SSH_ADDR} << EOF
             set -x
-            bash --login -c 'cd execute_marmousi_template ; bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
-            cp -r ~/execute_marmousi_template ${RESULTS_DIRECTORY}
+            bash --login -c 'cd execute_marmousi_template ; bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}; cp -r ~/execute_marmousi_template ${RESULTS_DIRECTORY}'
 EOF
 
     ;;

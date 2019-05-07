@@ -11,11 +11,11 @@ import collections, subprocess, os, datetime, sys
 exp64=[
 	# increasing size
 	["Standard_F16s_v2",144,16,1],
-	["Standard_F16s_v2",144,16,2],
-	["Standard_F16s_v2",144,16,3],
+	# ["Standard_F16s_v2",144,16,4],
+	# ["Standard_F16s_v2",144,16,2],
+	# ["Standard_F16s_v2",144,16,3],
 
 	# 64 jobs
-	["Standard_F16s_v2",144,16,4],
 	# ["Standard_F64s_v2",146,64,1],
 	# ["Standard_D64_v3",64,64,1],
 	# ["Standard_D64s_v3",65,64,1],
