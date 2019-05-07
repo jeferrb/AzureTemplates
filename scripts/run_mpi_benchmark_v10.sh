@@ -186,6 +186,7 @@ EOF
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
                 scp -r  ~/mymountpoint/toy2dac_instrumented/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
+                # scp -r  ~/mymountpoint/toy2dac_instrumented/ "10.0.0.\${host}":execute_
                 scp -r  ~/mymountpoint/toy2dac "10.0.0.\${host}":
             # Copy the execution script to all machines
                 scp ${EXECUTION_SCRIPT##*/} "10.0.0.\${host}":
@@ -201,6 +202,7 @@ EOF
         ssh ${SSH_ADDR} << EOF
             set -x
             bash --login -c 'cd execute_marmousi_template ; bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
+            cp -r ~/execute_marmousi_template ${RESULTS_DIRECTORY}
 EOF
 
     ;;

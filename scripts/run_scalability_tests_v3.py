@@ -10,12 +10,12 @@ import collections, subprocess, os, datetime, sys
 # Machine	Num	Cores	Qtd
 exp64=[
 	# increasing size
-	# ["Standard_F16s_v2",144,16,1],
-	# ["Standard_F16s_v2",144,16,2],
-	# ["Standard_F16s_v2",144,16,3],
+	["Standard_F16s_v2",144,16,1],
+	["Standard_F16s_v2",144,16,2],
+	["Standard_F16s_v2",144,16,3],
 
 	# 64 jobs
-	# ["Standard_F16s_v2",144,16,4],
+	["Standard_F16s_v2",144,16,4],
 	# ["Standard_F64s_v2",146,64,1],
 	# ["Standard_D64_v3",64,64,1],
 	# ["Standard_D64s_v3",65,64,1],
@@ -25,7 +25,7 @@ exp64=[
 	# ["Standard_F32s_v2",145,32,2],
 	# ["Standard_F16s_v2",144,16,4],
 	# ["Standard_F16s",116,16,4],
-	["Standard_D32_v3",55,32,2],
+	# ["Standard_D32_v3",55,32,2],
 	# ["Standard_D16_v3",45,16,4],
 
 	# 256 jobs
