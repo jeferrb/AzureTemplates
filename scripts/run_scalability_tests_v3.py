@@ -30,7 +30,7 @@ exp64=[
 
 	# 256 jobs
 	# ["Standard_F64s_v2",146,64,4]
-	# ["Standard_F16s_v2",144,16,16]
+	["Standard_F16s_v2",144,16,16]
 ]
 
 # print ("Usage: %s [binary_dir]"% sys.argv[0])
@@ -98,4 +98,4 @@ for exp in exp64:
 		print('*************   *************   *************   *************   *************')
 		print(cmd)
 		print('*************   *************   *************   *************   *************')
-		# subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		subprocess.run(cmd , shell = True) #, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
