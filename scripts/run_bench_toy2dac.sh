@@ -30,4 +30,5 @@ for i in `seq ${NUMBER_REPETITIONS}`; do
     (time mpirun -n "${NUMBER_JOBS}" -machine ~/machines ${BIN_FILE}) |& tee -a "${logfile}"
     echo "TIME_ENDING: " | tee -a "${logfile}"
     date | tee -a "${logfile}"
+    cp -r ~/execute_marmousi_template ${OUT_DIR}/result_execution_${i}
 done
