@@ -108,8 +108,8 @@ EOF
         done
 
         # Get coordinator address (the first one)
-        SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
-        if [[ -z "${SSH_ADDR}" ]]; then
+        COODINATOR_SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+        if [[ -z "${COODINATOR_SSH_ADDR}" ]]; then
             echo "Faile to create a VM instace, reverting changes"
             az group delete --resource-group ${GROUP_NAME} --yes --no-wait
         fi
@@ -117,13 +117,13 @@ EOF
         # If there is no coordinator key and profile, create one
         if [ ! -f $COORDINATOR_KEY ]; then
             # Create an id RSA for the coordenator
-            ssh ${SSH_ADDR} << EOF
+            ssh ${COODINATOR_SSH_ADDR} << EOF
                 set -x
                 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 EOF
             # retrieve coordinator (master) credential
-            scp ${SSH_ADDR}:.ssh/id_rsa.pub $COORDINATOR_KEY
-            scp ${SSH_ADDR}:.profile $COORDINATOR_PROF
+            scp ${COODINATOR_SSH_ADDR}:.ssh/id_rsa.pub $COORDINATOR_KEY
+            scp ${COODINATOR_SSH_ADDR}:.profile $COORDINATOR_PROF
             cat << EOF >> $COORDINATOR_PROF
 source /opt/intel/compilers_and_libraries_2018.3.222/linux/bin/compilervars.sh -arch intel64 -platform linux
 source /opt/intel/parallel_studio_xe_2018.3.051/bin/psxevars.sh
@@ -172,23 +172,23 @@ EOF
         fi
 
         # Get coordinator address (the first one)
-        SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
+        COODINATOR_SSH_ADDR=`grep "ssh " ${LOG_FILE} | head -n 1 | cut -c 23- | rev | cut -c 2- | rev`
 
         # Push the scripts and hostfile to coordinator
-        scp ${RESULTS_DIRECTORY}/hostfile ${RESULTS_DIRECTORY}/machines ${SSH_ADDR}:
-        scp ${EXECUTION_SCRIPT} ${SSH_ADDR}:
+        scp ${RESULTS_DIRECTORY}/hostfile ${RESULTS_DIRECTORY}/machines ${COODINATOR_SSH_ADDR}:
+        scp ${EXECUTION_SCRIPT} ${COODINATOR_SSH_ADDR}:
 
-        ssh ${SSH_ADDR} << EOF
+        ssh ${COODINATOR_SSH_ADDR} << EOF
             set -x
             # Add all nodes to known hosts and copy the private key to all machines
             rm ~/.ssh/known_hosts
             for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
-                scp -r  ~/mymountpoint/toy2dac_instrumented/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
-                scp -r  ~/mymountpoint/toy2dac_instrumented/run_marmousi_template_original_modeled/ "10.0.0.\${host}":execute_marmousi_template_original
-                scp -r  ~/mymountpoint/toy2dac_instrumented/run_ball_template_modeled/ "10.0.0.\${host}":execute_ball_template
-                scp -r  ~/mymountpoint/toy2dac "10.0.0.\${host}":
+                scp -r ~/mymountpoint/toy2dac_instrumented/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
+                scp -r ~/mymountpoint/toy2dac_instrumented/run_marmousi_template_original_modeled/ "10.0.0.\${host}":execute_marmousi_template_original
+                scp -r ~/mymountpoint/toy2dac_instrumented/run_ball_template_modeled/ "10.0.0.\${host}":execute_ball_template
+                scp -r ~/mymountpoint/toy2dac "10.0.0.\${host}":
             # Copy the execution script to all machines
                 scp ${EXECUTION_SCRIPT##*/} "10.0.0.\${host}":
             done
@@ -200,7 +200,7 @@ EOF
         # Effectively execute the benchmark
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
 
-        ssh ${SSH_ADDR} << EOF
+        ssh ${COODINATOR_SSH_ADDR} << EOF
             set -x
             bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
 EOF
