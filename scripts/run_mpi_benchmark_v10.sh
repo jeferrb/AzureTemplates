@@ -202,9 +202,7 @@ EOF
 
         ssh ${SSH_ADDR} << EOF
             set -x
-            for i in execute_marmousi_template execute_marmousi_template_original execute_ball_template; do
-                bash --login -c 'cd $i ; bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
-            done
+            bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
 EOF
 
     ;;

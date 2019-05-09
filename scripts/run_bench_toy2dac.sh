@@ -13,14 +13,17 @@ OUT_DIR="$HOME/mymountpoint${OUT_DIR##*mymountpoint}"
 BIN_FILE=$HOME/toy2dac/bin/toy2dac
 name="${BIN_FILE##*/}"
 
-
-for i in `seq ${NUMBER_REPETITIONS}`; do
-    logfile="${OUT_DIR}/${name}_${PWD##*/}_exec_${i}.log"
-    echo "Running ${name}_native (${i}/${NUMBER_REPETITIONS})" | tee -a "${logfile}"
-    echo "TIME_STARTING: " | tee -a "${logfile}"
-    date | tee -a "${logfile}"
-    (time mpirun -n "${NUMBER_JOBS}" -machine ~/machines ${BIN_FILE}) |& tee -a "${logfile}"
-    echo "TIME_ENDING: " | tee -a "${logfile}"
-    date | tee -a "${logfile}"
-    cp -r ${PWD} ${OUT_DIR}/result_${PWD##*/}_execution_${i}
+for test in execute_*; do
+    cd $test
+    for repetitionNum in `seq ${NUMBER_REPETITIONS}`; do
+        logfile="${OUT_DIR}/${name}_${PWD##*/}_exec_${repetitionNum}.log"
+        echo "Running ${name}_native (${repetitionNum}/${NUMBER_REPETITIONS})" | tee -a "${logfile}"
+        echo "TIME_STARTING: " | tee -a "${logfile}"
+        date | tee -a "${logfile}"
+        (time mpirun -n "${NUMBER_JOBS}" -machine ~/machines ${BIN_FILE}) |& tee -a "${logfile}"
+        echo "TIME_ENDING: " | tee -a "${logfile}"
+        date | tee -a "${logfile}"
+        cp -r ${PWD} ${OUT_DIR}/result_${PWD##*/}_execution_${repetitionNum}
+    done
+    cd $test
 done
