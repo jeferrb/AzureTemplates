@@ -14,7 +14,7 @@ BIN_FILE=$HOME/toy2dac/bin/toy2dac
 name="${BIN_FILE##*/}"
 
 # for test in ~/execute_*; do
-for test in "~/execute_marmousi_template_original"; do
+for test in "$HOME/execute_marmousi_template_original"; do
     cd $test
     for repetitionNum in `seq ${NUMBER_REPETITIONS}`; do
         logfile="${OUT_DIR}/${name}_${PWD##*/}_exec_${repetitionNum}.log"
