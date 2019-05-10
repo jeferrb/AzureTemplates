@@ -13,7 +13,7 @@ OUT_DIR="$HOME/mymountpoint${OUT_DIR##*mymountpoint}"
 BIN_FILE=$HOME/toy2dac/bin/toy2dac
 name="${BIN_FILE##*/}"
 
-for test in execute_*; do
+for test in ~/execute_*; do
     cd $test
     for repetitionNum in `seq ${NUMBER_REPETITIONS}`; do
         logfile="${OUT_DIR}/${name}_${PWD##*/}_exec_${repetitionNum}.log"
