@@ -33,7 +33,7 @@ import collections, subprocess, os, datetime, sys
 ]'''
 
 exp64=[
-	["Standard_F16s_v2",144,16,1]
+	["Standard_F16s_v2",144,16,1],
 	["Standard_F16s_v2",144,16,16],
 	["Standard_D16_v3",45,16,4],
 	["Standard_F16s_v2",144,16,3],
