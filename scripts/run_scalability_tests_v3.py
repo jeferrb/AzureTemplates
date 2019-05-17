@@ -47,9 +47,9 @@ exp64=[
 	# ["Standard_F16s_v2",144,16,1],
 	# ["Standard_F32s_v2",145,32,2],
 	# ["Standard_E32_v3",102,32,2],
-	["Standard_F64s_v2",146,64,4],
 	["Standard_E64_v3",108,64,1],
-	["Standard_F16s_v2",144,16,2]
+	["Standard_F64s_v2",146,64,4]
+	# ["Standard_F16s_v2",144,16,2]
 ]
 
 # print ("Usage: %s [binary_dir]"% sys.argv[0])
@@ -84,7 +84,7 @@ for exp in exp64:
 	experiments=[[exp[2]]*exp[3]]
 	print('\n\n\n\n\nRunning: azure_machine_name',azure_machine_name,'azure_machine_num',azure_machine_num, 'experiments', experiments, '\n\n\n\n')
 	today_str = now.strftime("%d-%m-%Y")
-	group_name = "gr-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
+	group_name = "gru-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
 	script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
 	base_cmd = ' '.join(['bash', script_name, group_name])
 	for experiment in experiments:
