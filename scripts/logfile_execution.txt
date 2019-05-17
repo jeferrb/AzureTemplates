@@ -1,0 +1,19 @@
+Starting:
+Wed May 15 14:44:06 -03 2019
+Wed May 15 14:44:06 -03 2019
++ echo perf record -o /Users/jeferson/echo_toy2dac-272115467.perf.data -genv PERF_FILE_NAME=/Users/jeferson/echo_toy2dac-272115467.perf.data echo '$PERF_FILE_NAME'
+perf record -o /Users/jeferson/echo_toy2dac-272115467.perf.data -genv PERF_FILE_NAME=/Users/jeferson/echo_toy2dac-272115467.perf.data echo $PERF_FILE_NAME
+
+real	0m0.001s
+user	0m0.000s
+sys	0m0.000s
++ echo perf record -o /Users/jeferson/echo_toy2dac-1955932525.perf.data -genv PERF_FILE_NAME=/Users/jeferson/echo_toy2dac-1955932525.perf.data echo '$PERF_FILE_NAME'
+perf record -o /Users/jeferson/echo_toy2dac-1955932525.perf.data -genv PERF_FILE_NAME=/Users/jeferson/echo_toy2dac-1955932525.perf.data echo $PERF_FILE_NAME
+
+real	0m0.001s
+user	0m0.000s
+sys	0m0.000s
+Ending:
+Ending:
+Wed May 15 14:44:06 -03 2019
+Wed May 15 14:44:06 -03 2019

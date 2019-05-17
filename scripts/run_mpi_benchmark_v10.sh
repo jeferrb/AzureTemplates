@@ -185,8 +185,9 @@ EOF
             for host in \`seq 4 $((${NUMBER_CURRENT_INSTANCES}+3))\`; do
                 ssh-keyscan -H "10.0.0.\${host}" >> ~/.ssh/known_hosts
                 scp .ssh/id_rsa .ssh/id_rsa.pub "10.0.0.\${host}":.ssh
-                scp -r ~/mymountpoint/toy2dac_instrumented/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template
-                scp -r ~/mymountpoint/toy2dac_instrumented/run_marmousi_template_original_modeled/ "10.0.0.\${host}":execute_marmousi_template_original
+                scp -r ~/mymountpoint/toy2dac_instrumented/marmousi_template_modeled "10.0.0.\${host}":execute_marmousi_template_medium
+                scp -r ~/mymountpoint/toy2dac_instrumented/run_marmousi_template_original_modeled/ "10.0.0.\${host}":execute_marmousi_template_small
+                scp -r ~/mymountpoint/toy2dac_instrumented/run_marmousi_template_tinny_modeled/ "10.0.0.\${host}":execute_marmousi_template_tinny
                 scp -r ~/mymountpoint/toy2dac_instrumented/run_ball_template_modeled/ "10.0.0.\${host}":execute_ball_template
                 scp -r ~/mymountpoint/toy2dac "10.0.0.\${host}":
             # Copy the execution script to all machines

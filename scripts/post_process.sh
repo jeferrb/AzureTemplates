@@ -19,7 +19,7 @@
 	# sudiff CUDA/crs.stack.su OpenMP/crs.stack.su > diff.su
 	# suximage < CRS/CUDA/crs.stack.su &
 
-	less ../116_instances_4_date_31-07-2018_result.log.txt | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | tr -d "s" | sed "s/m/*60+/g" | sed "s/*60+g/mg/g" > times.txt
+	less ../116_instances_4_date_31-07-2018_result.log.txt | grep 'real\|user\|sys\|Running' | grep -v 'echo\|username' | grep real -B1 -A2 | awk '{print $2}' | tr -d "s" | sed "s/s//g" "s/m/*60+/g" | sed "s/*60+g/mg/g" > times.txt
 cat times.txt | paste -d " " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	# > ../${ls results | grep Standard | head -n1 | rev | cut -d '_' -n -f4- | rev}.times.csv
@@ -262,5 +262,19 @@ for i in results_g-* ;do
 		echo "$i has no logs"
 	fi
 done
-
 paste -d ',' results_g-*/result/*.csv > results_toy2dac_06-may.csv
+
+for i in results_g-*-10-05-2019 ;do
+	for log in $i/result/toy2dac*_exec_1.log; do
+		echo $i > $i/result/${i}_${log##*/}.csv
+		experiment=${log##*/}
+		echo ${i} | awk -F\- '{print $6*$7}' >> $i/result/${i}_${experiment}.csv
+		echo ${experiment%%.log} >> $i/result/${i}_${experiment}.csv
+		tail  $log | grep real | awk '{print $2}' | sed "s/s//g" | sed "s/m/:/g"  | awk -F: '{ print ($1 * 60) + $2 }' >> $i/result/${i}_${experiment}.csv
+		grep ParamountItEnd $log | awk '{print $10}' >> $i/result/${i}_${experiment}.csv
+	done
+done
+
+# paste -d ',' results_g-*/result/*.csv > results_toy2dac_10-may.csv
+paste -d ',' results_g-*/result/*execute_marmousi_template_original_exec*.csv > results_toy2dac_marmousi_original_10-may.csv
+paste -d ',' results_g-*/result/*execute_marmousi_template_exec*.csv > results_toy2dac_marmousi_10-may.csv
