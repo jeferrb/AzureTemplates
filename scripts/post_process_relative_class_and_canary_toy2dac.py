@@ -5,7 +5,7 @@ import pandas as pd
 import glob, os
 import json, math
 
-useconds=1000000
+useconds=10**6
 
 
 # import matplotlib.pyplot as plt
@@ -25,48 +25,6 @@ file='results_toy2dac_may02.csv'
 # file='time_nas_mean_plus.csv'
 print('Handling %s' % file)
 df = pd.read_csv(file)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # npb_execution=1
 npb_classes=['A','B','C','D']
