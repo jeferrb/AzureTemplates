@@ -9,12 +9,7 @@ import collections, subprocess, os, datetime, sys
 '''
 # Machine	Num	Cores	Qtd
 '''exp64=[
-	# increasing size
-	["Standard_F16s_v2",144,16,3],
-	["Standard_F16s_v2",144,16,2],
-	["Standard_F16s_v2",144,16,1],
-
-	# 64 jobs
+# 64 jobs
 	["Standard_F64s_v2",146,64,1],
 	["Standard_D64_v3",64,64,1],
 	["Standard_F32s_v2",145,32,2],
@@ -27,7 +22,11 @@ import collections, subprocess, os, datetime, sys
 	["Standard_F16s",116,16,4],
 	["Standard_D16_v3",45,16,4],
 
-	# 256 jobs
+# increasing size
+	["Standard_F16s_v2",144,16,3],
+	["Standard_F16s_v2",144,16,2],
+	["Standard_F16s_v2",144,16,1],
+	[],
 	["Standard_F64s_v2",146,64,4],
 	["Standard_F16s_v2",144,16,16],
 	[]
@@ -35,17 +34,27 @@ import collections, subprocess, os, datetime, sys
 
 
 exp64=[
+# 64 jobs
 	["Standard_F64s_v2",146,64,1],
 	["Standard_D64_v3",64,64,1],
 	["Standard_F32s_v2",145,32,2],
 	["Standard_D64s_v3",65,64,1],
-	# ["Standard_E64_v3",108,64,1],
 	["Standard_F16s_v2",144,16,4],
 	["Standard_E32_v3",102,32,2],
-	["Standard_D32_v3",55,32,2],
-	["Standard_E16_v3",98,16,4],
 	["Standard_F16s",116,16,4],
+	["Standard_D32_v3",55,32,2],
+
+# increasing size
+	["Standard_F16s_v2",144,16,1],
+	["Standard_E64_v3",108,64,1],
+	["Standard_F16s_v2",144,16,3],
+	["Standard_F16s_v2",144,16,2],
+
+	["Standard_E16_v3",98,16,4],
+	["Standard_F64s_v2",146,64,4],
 	["Standard_D16_v3",45,16,4],
+	["Standard_F16s_v2",144,16,16],
+
 	[]
 ]
 
@@ -78,11 +87,10 @@ experiments = [
 for exp in exp64:
 	if len(exp)==0:
 		break
-	now = datetime.datetime.now()
 	azure_machine_name,azure_machine_num = exp[0],exp[1]
 	experiments=[[exp[2]]*exp[3]]
 	print('\n\n\n\n\nRunning: azure_machine_name',azure_machine_name,'azure_machine_num',azure_machine_num, 'experiments', experiments, '\n\n\n\n')
-	today_str = now.strftime("%d-%m-%Y")
+	today_str = datetime.datetime.now().strftime("%d-%m-%Y")
 	group_name = "gru-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
 	script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
 	base_cmd = ' '.join(['bash', script_name, group_name])
