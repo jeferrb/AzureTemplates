@@ -102,6 +102,7 @@ case ${2} in
             ssh-keygen -R $i
             ssh-keygen -R `dig +short $i`
             ssh-keyscan -H $i >> ~/.ssh/known_hosts
+            MY_DATE=`date +"%s_%m-%d-%y"`
             ssh ${USERNAME}@${i} dmesg  >> ${RESULTS_DIRECTORY}/dmesg_${i}_${VM_SIZE}_${MY_DATE}.txt
             ssh ${USERNAME}@${i} uptime >> ${RESULTS_DIRECTORY}/dmesg_${i}_${VM_SIZE}_${MY_DATE}.txt
             ssh ${USERNAME}@${i} << EOF
@@ -206,10 +207,10 @@ EOF
         MY_DATE=`date +"%s_%m-%d-%y"`
         ssh ${COODINATOR_SSH_ADDR} dmesg  >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
         ssh ${COODINATOR_SSH_ADDR} uptime >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
-#         ssh ${COODINATOR_SSH_ADDR} << EOF
-#             set -x
-#             bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
-# EOF
+        ssh ${COODINATOR_SSH_ADDR} << EOF
+            set -x
+            # bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
+EOF
 
     ;;
     'destroy')

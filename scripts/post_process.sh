@@ -321,3 +321,12 @@ for experiment in "${EXPERIMENTS[@]}"; do
 	paste -d ',' results_mygroup-klp-*/result/$experiment > experiments_csv/$experiment.csv
 done
 
+
+
+for i in results_gru*-1-10-06-2019; do
+    echo $i
+    tail -n2 $i/result/dmesg_prefix*.txt | head -n1 | awk '{print $2}' | sed 's/]//'
+done
+
+
+

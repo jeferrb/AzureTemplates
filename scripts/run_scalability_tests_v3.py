@@ -30,9 +30,26 @@ import collections, subprocess, os, datetime, sys
 	["Standard_F64s_v2",146,64,4],
 	["Standard_F16s_v2",144,16,16],
 	[]
-]'''
-
+]
 '''
+
+exp64=[
+# Single machine (for dmesg time)
+	["Standard_D16_v3",45,16,1],
+	["Standard_D32_v3",55,32,1],
+	["Standard_D64_v3",64,64,1],
+	["Standard_D64s_v3",65,64,1],
+	["Standard_E16_v3",98,16,1],
+	["Standard_E32_v3",102,32,1],
+	["Standard_E64_v3",108,64,1],
+	["Standard_F16s",116,16,1],
+	["Standard_F16s_v2",144,16,1],
+	["Standard_F32s_v2",145,32,1],
+	["Standard_F64s_v2",146,64,1],
+	[]
+]
+'''
+
 exp64=[
 # 64 jobs
 	["Standard_F64s_v2",146,64,1],
@@ -58,22 +75,6 @@ exp64=[
 	[]
 ]
 '''
-exp64=[
-# 64 jobs
-	# ["Standard_D16_v3",45,16,1],
-	["Standard_D32_v3",55,32,1],
-	["Standard_D64_v3",64,64,1],
-	["Standard_D64s_v3",65,64,1],
-	["Standard_E16_v3",98,16,1],
-	["Standard_E32_v3",102,32,1],
-	["Standard_E64_v3",108,64,1],
-	["Standard_F16s",116,16,1],
-	["Standard_F16s_v2",144,16,1],
-	["Standard_F32s_v2",145,32,1],
-	["Standard_F64s_v2",146,64,1],
-# increasing size
-	[]
-]
 
 # print ("Usage: %s [binary_dir]"% sys.argv[0])
 if (len(sys.argv) < 2):
@@ -108,7 +109,7 @@ for exp in exp64:
 	experiments=[[exp[2]]*exp[3]]
 	print('\n\n\n\n\nRunning: azure_machine_name',azure_machine_name,'azure_machine_num',azure_machine_num, 'experiments', experiments, '\n\n\n\n')
 	today_str = datetime.datetime.now().strftime("%d-%m-%Y")
-	group_name = "gru-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
+	group_name = "g-%d-%s-%d-%d-%s"%(azure_machine_num, azure_machine_name.replace('_','-'), exp[2], exp[3], today_str)
 	script_name = os.path.realpath('./scripts/run_mpi_benchmark_v10.sh')
 	base_cmd = ' '.join(['bash', script_name, group_name])
 	for experiment in experiments:
