@@ -95,12 +95,15 @@ case ${2} in
         # wait while to create the least machine
         sleep 5
 
+
         # Add access credential for all virtual machines and copy the binary files to each machine
         for i in `grep "ssh " ${LOG_FILE} | cut -d '@' -f 2 | rev | cut -c 2- | rev`; do
             echo " Copy id from $i"
             ssh-keygen -R $i
             ssh-keygen -R `dig +short $i`
             ssh-keyscan -H $i >> ~/.ssh/known_hosts
+            ssh ${USERNAME}@${i} dmesg  >> ${RESULTS_DIRECTORY}/dmesg_${i}_${VM_SIZE}_${MY_DATE}.txt
+            ssh ${USERNAME}@${i} uptime >> ${RESULTS_DIRECTORY}/dmesg_${i}_${VM_SIZE}_${MY_DATE}.txt
             ssh ${USERNAME}@${i} << EOF
                 cp -r ${BIN_PATH} ${NEW_BIN_PATH}
                 echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
@@ -201,7 +204,8 @@ EOF
         # Effectively execute the benchmark
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
         MY_DATE=`date +"%s_%m-%d-%y"`
-        ssh ${COODINATOR_SSH_ADDR} dmesg > dmesg_${VM_SIZE}_${MY_DATE}.txt
+        ssh ${COODINATOR_SSH_ADDR} dmesg >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
+        ssh ${COODINATOR_SSH_ADDR} uptime >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
 #         ssh ${COODINATOR_SSH_ADDR} << EOF
 #             set -x
 #             bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
