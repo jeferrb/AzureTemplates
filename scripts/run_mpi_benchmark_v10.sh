@@ -204,7 +204,7 @@ EOF
         # Effectively execute the benchmark
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
         MY_DATE=`date +"%s_%m-%d-%y"`
-        ssh ${COODINATOR_SSH_ADDR} dmesg >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
+        ssh ${COODINATOR_SSH_ADDR} dmesg  >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
         ssh ${COODINATOR_SSH_ADDR} uptime >> ${RESULTS_DIRECTORY}/dmesg_${VM_SIZE}_${MY_DATE}.txt
 #         ssh ${COODINATOR_SSH_ADDR} << EOF
 #             set -x
