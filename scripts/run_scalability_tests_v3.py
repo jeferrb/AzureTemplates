@@ -60,7 +60,7 @@ exp64=[
 '''
 exp64=[
 # 64 jobs
-	["Standard_D16_v3",45,16,1],
+	# ["Standard_D16_v3",45,16,1],
 	["Standard_D32_v3",55,32,1],
 	["Standard_D64_v3",64,64,1],
 	["Standard_D64s_v3",65,64,1],
