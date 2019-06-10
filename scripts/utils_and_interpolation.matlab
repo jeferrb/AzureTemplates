@@ -1,5 +1,5 @@
 
-% Generic interpolation algorithim
+% Generic interpolation algorithm from toy2dac original marmousi
 lenx=141
 leny=681
 increasing=0.1

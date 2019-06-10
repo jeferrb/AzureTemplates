@@ -20,14 +20,14 @@ paste -d, results_mygroup-klp-26-04-2019-machine-*/result/*.csv > klp_results.cs
 
 
 '''
-# 10     "Standard_A2",            "2",       "3584" x
+10     "Standard_A2",            "2",       "3584"
 100    "Standard_E2_v3",         "2",       "16384"
 101    "Standard_E2s_v3",        "2",       "16384"
 11     "Standard_A2_v2",         "2",       "4096"
 118    "Standard_F2",            "2",       "4096"
 119    "Standard_F2s",           "2",       "4096"
 17     "Standard_A5",            "2",       "14336"
-# 2      "Basic_A2",               "2",       "3584" x
+2      "Basic_A2",               "2",       "3584"
 32     "Standard_D11",           "2",       "14336"
 33     "Standard_D11_v2",        "2",       "14336"
 47     "Standard_D2",            "2",       "7168"
@@ -50,6 +50,22 @@ machines = {
 47:     "Standard_D2",
 48:     "Standard_D2_v2",
 50:     "Standard_D2_v3"
+}
+
+machines_prices = {
+10:     "Standard_A2",
+100:    "0.126",
+101:    "0.126",
+11:     "0.091",
+118:    "0.099",
+119:    "0.0846",
+17:     "0.25",
+2:      "0.079",
+32:     "Standard_D11",
+33:     "0.185",
+47:     "Standard_D2",
+48:     "0.146",
+50:     "0.096"
 }
 
 
@@ -102,3 +118,5 @@ for experiment in experiments:
 	fig.autofmt_xdate()
 	plt.savefig('%s_time.pdf'%(exp_name))
 	plt.clf()
+
+

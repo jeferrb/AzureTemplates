@@ -278,3 +278,46 @@ done
 # paste -d ',' results_g-*/result/*.csv > results_toy2dac_10-may.csv
 paste -d ',' results_g-*/result/*execute_marmousi_template_original_exec*.csv > results_toy2dac_marmousi_original_10-may.csv
 paste -d ',' results_g-*/result/*execute_marmousi_template_exec*.csv > results_toy2dac_marmousi_10-may.csv
+
+
+
+# Last Toy2Dac multiple datasets analysis
+
+for i in results_gru-*-20-05-2019 ;do
+	for log in $i/result/toy2dac*_exec_1.log; do
+		echo $i > $i/result/${i}_${log##*/}.csv
+		experiment=${log##*/}
+		echo ${i} | awk -F\- '{print $6*$7}' >> $i/result/${i}_${experiment}.csv
+		echo ${experiment%%.log} >> $i/result/${i}_${experiment}.csv
+		tail  $log | grep real | awk '{print $2}' | sed "s/s//g" | sed "s/m/:/g"  | awk -F: '{ print ($1 * 60) + $2 }' >> $i/result/${i}_${experiment}.csv
+		grep ParamountItEnd $log | awk '{print $10}' >> $i/result/${i}_${experiment}.csv
+	done
+done
+
+paste -d ',' results_gru-*-20-05-2019/result/*execute_marmousi_template_medium_exec_?.log.csv > results_toy2dac_marmousi_medium_20-may.csv
+paste -d ',' results_gru-*-20-05-2019/result/*execute_marmousi_template_tinny_exec_?.log.csv > results_toy2dac_marmousi_tiny_20-may.csv
+paste -d ',' results_gru-*-20-05-2019/result/*execute_marmousi_template_small_exec_?.log.csv > results_toy2dac_marmousi_small_20-may.csv
+
+
+
+
+
+# KLP at multiple setups
+
+cd results_klp_may_2019
+
+tail -n4 results_mygroup-klp-25-04-2019-machine-10/result/source_LeNet-2343_target-02p_0_initial-lenet-2343v-2p-49664-per-layers_target-KLPcomm_verbose-n_lockedInput-1024.output-1.log | grep system | sed 's/user//g' | awk '{print ($1)}'
+
+for exp in results_mygroup-klp-*-04-2019-machine-*/result/*.output-?.log; do
+	# echo $exp
+	echo ${exp%%/*} > ${exp}.csv
+	tail -n4 ${exp} | grep system | sed 's/user//g' | awk '{print ($1)}' >> ${exp}.csv
+	grep "\*\*\*\*TIME\*\*\*" $exp | awk '{print $2}' >> ${exp}.csv
+done
+
+mkdir experiments_csv
+declare -a EXPERIMENTS=(source_LeNet-0604_target-02p_0_initial-lenet-604v-2p-49664-irgreedy-locked_target-KLPcomm_verbose-n_lockedInput-256.output-1.log.csv source_LeNet-0604_target-02p_0_initial-lenet-604v-2p-49664-per-layers_target-KLPcomm_verbose-n_lockedInput-256.output-1.log.csv source_LeNet-0604_target-04p_0_initial-lenet-604v-4p-22528-irgreedy-locked_target-KLPcomm_verbose-n_lockedInput-256.output-1.log.csv source_LeNet-2343_target-02p_0_initial-lenet-2343v-2p-49664-per-layers_target-KLPcomm_verbose-n_lockedInput-1024.output-1.log.csv)
+for experiment in "${EXPERIMENTS[@]}"; do
+	paste -d ',' results_mygroup-klp-*/result/$experiment > experiments_csv/$experiment.csv
+done
+

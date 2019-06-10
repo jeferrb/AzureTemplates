@@ -141,7 +141,7 @@ EOF
     ;;
     'execute')
     # TODO: colocar o tipo das instancias no logfile
-    # VM_SIZE=`grep "vmSize" ${LOG_FILE} -A2 | tail -n1 | awk '{print $2}' | sed 's/\"//g'`
+    VM_SIZE=`grep "vmSize" ${LOG_FILE} -A2 | tail -n1 | awk '{print $2}' | sed 's/\"//g'`
 
         EXECUTION_SCRIPT="${3}"
         NUMBER_JOBS="${4}"
@@ -200,11 +200,12 @@ EOF
 EOF
         # Effectively execute the benchmark
         echo bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}
-
-        ssh ${COODINATOR_SSH_ADDR} << EOF
-            set -x
-            bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
-EOF
+        MY_DATE=`date +"%s_%m-%d-%y"`
+        ssh ${COODINATOR_SSH_ADDR} dmesg > dmesg_${VM_SIZE}_${MY_DATE}.txt
+#         ssh ${COODINATOR_SSH_ADDR} << EOF
+#             set -x
+#             bash --login -c 'bash ~/${EXECUTION_SCRIPT##*/} ${NUMBER_REPETITIONS} ${NEW_BIN_PATH} ${NUMBER_JOBS} ${RESULTS_DIRECTORY}'
+# EOF
 
     ;;
     'destroy')
