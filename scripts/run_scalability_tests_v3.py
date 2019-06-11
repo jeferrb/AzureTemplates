@@ -36,16 +36,16 @@ import collections, subprocess, os, datetime, sys
 exp64=[
 # Single machine (for dmesg time)
 	["Standard_D16_v3",45,16,1],
-	["Standard_D32_v3",55,32,1],
-	["Standard_D64_v3",64,64,1],
-	["Standard_D64s_v3",65,64,1],
-	["Standard_E16_v3",98,16,1],
-	["Standard_E32_v3",102,32,1],
-	["Standard_E64_v3",108,64,1],
-	["Standard_F16s",116,16,1],
-	["Standard_F16s_v2",144,16,1],
-	["Standard_F32s_v2",145,32,1],
-	["Standard_F64s_v2",146,64,1],
+	# ["Standard_D32_v3",55,32,1],
+	# ["Standard_D64_v3",64,64,1],
+	# ["Standard_D64s_v3",65,64,1],
+	# ["Standard_E16_v3",98,16,1],
+	# ["Standard_E32_v3",102,32,1],
+	# ["Standard_E64_v3",108,64,1],
+	# ["Standard_F16s",116,16,1],
+	# ["Standard_F16s_v2",144,16,1],
+	# ["Standard_F32s_v2",145,32,1],
+	# ["Standard_F64s_v2",146,64,1],
 	[]
 ]
 '''
