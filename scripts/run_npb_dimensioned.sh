@@ -19,7 +19,8 @@ run_bench() {
   local repetitions="${4}"
   local path="${5}"
   local out_dir="${6}"
-  local name="${bench}.${class}.${nprocs}"
+  local name="${bench}.${class}.x"
+  # local name="${bench}.${class}.${nprocs}"
 
   if [ ! -e "${path}/${name}" ]; then
     echo "$name does not exists"
@@ -38,7 +39,7 @@ run_bench() {
     done
 }
 
-for binary in $BIN_PATH/*A.x ; do
+for binary in $BIN_PATH/*.A.x ; do
   binfile=${binary##*/}
   bench=${binfile:0:2}
   class=${binfile:3:1}
