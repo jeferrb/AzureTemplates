@@ -29,17 +29,17 @@ run_bench() {
 
   for i in `seq ${repetitions}`; do
       local logfile="${out_dir}/${name}_exec_${i}_native.log"
-      echo "Running ${name}_native (${i}/${repetitions})" | tee -a "${logfile}"
-      echo "TIME: STARTING: " | tee -a "${logfile}"
-      date | tee -a "${logfile}"
+      echo "Running ${name}_native (${i}/${repetitions})" >> out.txt 2>&1
+      echo "TIME: STARTING: " >> out.txt 2>&1
+      date >> out.txt 2>&1
       # mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile perf stat "${path}/${name}" | tee -a "${logfile}"
-      mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" | tee -a "${logfile}"
-      echo "TIME: ENDING: " | tee -a "${logfile}"
-      date | tee -a "${logfile}"
+      mpirun -np "${nprocs}" -mca plm_rsh_args "-o StrictHostKeyChecking=no" --oversubscribe --hostfile hostfile "${path}/${name}" >> out.txt 2>&1
+      echo "TIME: ENDING: " >> out.txt 2>&1
+      date >> out.txt 2>&1
     done
 }
 
-for binary in $BIN_PATH/*.A.x ; do
+for binary in $BIN_PATH/*.S.x ; do
   binfile=${binary##*/}
   bench=${binfile:0:2}
   class=${binfile:3:1}
